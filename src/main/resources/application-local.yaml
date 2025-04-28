@@ -7,12 +7,12 @@ spring:
     password: 1313
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: none # don't touch, it gonna be disaster if you change!
   liquibase:
     enabled: true
     change-log: classpath:db/migration/changelog-master-local.xml
     default-schema: public
-    drop-first: false
+    drop-first: false # again don't touch, I've already warned you above!
     clear-checksums: true
     contexts: olvan
 server:
@@ -26,4 +26,4 @@ logging:
     org.hibernate.orm.connections.pooling: warn
 jwt:
   secret: OlvanProjectAboutEducation134567890098765434567898765DFGHJKRTYUIcvbnmghjkuytttyuioqwertyuiolkkjgfdszxcvbnm
-  expiry: 604800000
+  expiry: 604800000 #milliseconds = 7 days

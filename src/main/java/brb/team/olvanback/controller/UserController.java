@@ -4,14 +4,14 @@ import brb.team.olvanback.dto.CommonResponse;
 import brb.team.olvanback.dto.SignInRequest;
 import brb.team.olvanback.dto.SignUpRequest;
 import brb.team.olvanback.service.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
+@Tag(name = "Authentication")
+@CrossOrigin
 public class UserController {
 
     private final UserService userService;
