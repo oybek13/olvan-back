@@ -22,8 +22,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh 'docker rmi -f olvan-back-service-image || true'
-                def tag = "olvan-back-service-image:${BUILD_NUMBER}"
-                sh "docker build -t ${tag} ."
+                sh 'docker build -t olvan-back-service-image .'
             }
         }
 
