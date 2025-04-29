@@ -2,9 +2,9 @@ spring:
   application:
     name: olvan-back
   datasource:
-    url: jdbc:postgresql://localhost:5432/olvanbackdb
-    username: postgres
-    password: "0000"
+    url: jdbc:postgresql://188.245.193.2:5432/olvanbackdb
+    username: olvanuser
+    password: "olvanpassword#"
   jpa:
     hibernate:
       ddl-auto: none # don't touch, it gonna be disaster if you change!
@@ -19,8 +19,8 @@ server:
   port: 6363
 env:
   url:
-    name: http://localhost:6363
-    description: "Local Server"
+    name: http://188.245.193.2:6363
+    description: "Prod Server"
 logging:
   level:
     org.hibernate.orm.connections.pooling: warn

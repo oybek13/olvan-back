@@ -114,6 +114,7 @@
     </dependencyManagement>
 
     <build>
+        <finalName>olvan-back-service</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
