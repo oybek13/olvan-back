@@ -4,7 +4,7 @@ services:
     image: postgres:15
     environment:
       POSTGRES_USER: olvanuser
-      POSTGRES_PASSWORD: olvanpassword#
+      POSTGRES_PASSWORD: 'olvanpassword#'
       POSTGRES_DB: olvanbackdb
     ports:
       - "5432:5432"
@@ -18,7 +18,7 @@ services:
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/olvanbackdb
       SPRING_DATASOURCE_USERNAME: olvanuser
-      SPRING_DATASOURCE_PASSWORD: olvanpassword#
+      SPRING_DATASOURCE_PASSWORD: 'olvanpassword#'
     ports:
       - "6363:6363"
 
