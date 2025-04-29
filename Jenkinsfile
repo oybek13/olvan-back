@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/oybek13/olvan-back.git'
+                git branch: 'main', url: 'https://github.com/oybek13/olvan-back.git'
             }
         }
 
