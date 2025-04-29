@@ -52,7 +52,6 @@ public class UserService {
                 .message("Sign in successful")
                 .data(jwtGenerator.generateToken(sign.getUsername()))
                 .build();
-
     }
 
 
