@@ -22,7 +22,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh 'docker rmi -f olvan-back-service-image || true'
-                sh 'docker build -t olvan-back-service-image .'
+                def tag = "olvan-back-service-image:${BUILD_NUMBER}"
+                sh "docker build -t ${tag} ."
             }
         }
 
@@ -38,6 +39,7 @@ pipeline {
         always {
             echo "Cleaning up..."
             sh 'docker-compose down'
+            sh 'docker image prune -f'
         }
     }
 }
