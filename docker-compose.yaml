@@ -22,3 +22,5 @@ services:
     ports:
       - "6363:6363"
 
+volumes:
+  pgdata:
