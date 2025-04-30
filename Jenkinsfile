@@ -12,6 +12,8 @@ pipeline {
             }
         }
 
+        test
+
         stage('Build Spring Boot App') {
             steps {
                 sh 'chmod +x mvnw'
