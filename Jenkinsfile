@@ -4,7 +4,7 @@ pipeline {
     environment {
         DOCKER_COMPOSE_VERSION = '1.29.2'
     }
-
+ test
     stages {
         stage('Clone Repository') {
             steps {
