@@ -23,7 +23,7 @@ pipeline {
                 sh 'docker build -t olvan-back-service-image .'
             }
         }
-
+test
         stage('Start with Docker Compose') {
             steps {
                 sh 'docker-compose down || true'
