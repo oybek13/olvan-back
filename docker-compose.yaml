@@ -1,27 +1,14 @@
 version: '3.8'
-services:
-  db:
-    hostname: db
-    image: postgres:15
-    environment:
-      POSTGRES_USER: olvanuser
-      POSTGRES_PASSWORD: 'olvanpassword#'
-      POSTGRES_DB: olvanbackdb
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
 
+services:
   app:
-    build: .
-    depends_on:
-      - db
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/olvanbackdb
-      SPRING_DATASOURCE_USERNAME: olvanuser
-      SPRING_DATASOURCE_PASSWORD: 'olvanpassword#'
+    container_name: olvan-back
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "6363:6363"
-
+    environment:
+      - TZ=Asia/Tashkent
 volumes:
   pgdata:
