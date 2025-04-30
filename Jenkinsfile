@@ -11,7 +11,6 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/oybek13/olvan-back.git'
             }
         }
-        test
         stage('Build Spring Boot App') {
             steps {
                 sh 'chmod +x mvnw'
