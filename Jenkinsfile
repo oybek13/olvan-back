@@ -17,8 +17,7 @@ pipeline {
                 sh './mvnw clean package -DskipTests'
             }
         }
-
-        test
+        
         stage('Build Docker Image') {
             steps {
                 sh 'docker rmi -f olvan-back-service-image || true'
