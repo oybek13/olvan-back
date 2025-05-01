@@ -9,6 +9,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 public class OlvanBackApplication {
 
     public static void main(String[] args) {
+
         SpringApplication.run(OlvanBackApplication.class, args);
     }
 
