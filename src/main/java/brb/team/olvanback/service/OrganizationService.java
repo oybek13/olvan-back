@@ -16,9 +16,11 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public record OrganizationService(UserRepository userRepository,
-                                  ObjectMapper objectMapper,
-                                  PasswordEncoder passwordEncoder) {
+public class OrganizationService {
+
+    private final UserRepository userRepository;
+    private final ObjectMapper objectMapper;
+    private final PasswordEncoder passwordEncoder;
 
     public CommonResponse createOrganization(OrganizationRequest request) throws JsonProcessingException {
         if (userRepository.existsByUsername(request.getUsername()))
