@@ -55,7 +55,7 @@ public class OrganizationService {
         return CommonResponse.builder()
                 .success(true)
                 .message("Success!")
-                .data(user)
+                .data(Mapper.map(user))
                 .build();
     }
 
@@ -94,31 +94,56 @@ public class OrganizationService {
                                  Boolean active,
                                  int page,
                                  int size) {
+        // Validate pagination parameters
+        if (page < 0 && size <= 0) {
+            return CommonResponse.builder()
+                    .success(false)
+                    .message("Invalid pagination parameters: page must be >= 0 and size must be > 0")
+                    .data(null)
+                    .build();
+        }
+
+        // Create pageable object
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+
+        // Build specification
         Specification<User> spec = Specification.where(null);
-        if (username != null && !username.isEmpty()) {
+
+        // Add filters only if parameters are provided
+        if (username != null && !username.trim().isEmpty()) {
             spec = spec.and((root, query, criteriaBuilder) ->
-                    criteriaBuilder.like(criteriaBuilder.lower(root.get("username")), "%" + username.toLowerCase() + "%"));
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("username")),
+                            "%" + username.trim().toLowerCase() + "%"));
         }
-        if (fullName != null && !fullName.isEmpty()) {
+        if (fullName != null && !fullName.trim().isEmpty()) {
             spec = spec.and((root, query, criteriaBuilder) ->
-                    criteriaBuilder.like(criteriaBuilder.lower(root.get("fullName")), "%" + fullName.toLowerCase() + "%"));
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("fullName")),
+                            "%" + fullName.trim().toLowerCase() + "%"));
         }
-        if (inn != null && !inn.isEmpty()) {
+        if (inn != null && !inn.trim().isEmpty()) {
             spec = spec.and((root, query, criteriaBuilder) ->
-                    criteriaBuilder.like(criteriaBuilder.lower(root.get("inn")), "%" + inn.toLowerCase() + "%"));
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("inn")),
+                            "%" + inn.trim().toLowerCase() + "%"));
         }
-        if (role != null && !role.toString().isEmpty()) {
+        if (role != null) {
             spec = spec.and((root, query, criteriaBuilder) ->
-                    criteriaBuilder.like(criteriaBuilder.lower(root.get("role")), "%" + role + "%"));
+                    criteriaBuilder.equal(root.get("role"), role));
         }
         if (active != null) {
             spec = spec.and((root, query, criteriaBuilder) ->
-                    criteriaBuilder.equal(root.get("active"), active));
+                    criteriaBuilder.equal(root.get("isActive"), active));
         }
 
+        // Query the repository
         Page<User> userPage = userRepository.findAll(spec, pageable);
 
+        // Log for debugging
+        log.debug("Query executed with spec: username={}, fullName={}, inn={}, role={}, active={}, page={}, size={}",
+                username, fullName, inn, role, active, page, size);
+        log.debug("Result: totalElements={}, contentSize={}",
+                userPage.getTotalElements(), userPage.getContent().size());
+
+        // Build response
         return CommonResponse.builder()
                 .success(true)
                 .message("Success!")

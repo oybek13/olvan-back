@@ -22,4 +22,15 @@ public class Mapper {
         }
         return list;
     }
+
+    public static OrganizationResponse map(User user) {
+        return OrganizationResponse.builder()
+                .username(user.getUsername())
+                .password(user.getPassword())
+                .fullName(user.getFullName())
+                .inn(user.getInn())
+                .role(user.getRole())
+                .isActive(user.isActive())
+                .build();
+    }
 }

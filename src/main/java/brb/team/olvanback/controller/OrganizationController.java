@@ -51,9 +51,9 @@ public class OrganizationController {
                                                  @RequestParam(value = "fullName", required = false) String fullName,
                                                  @RequestParam(value = "inn", required = false) String inn,
                                                  @RequestParam(value = "role", required = false) UserRole role,
-                                                 @RequestParam(value = "status", required = false) boolean status,
+                                                 @RequestParam(value = "active", required = false) boolean active,
                                                  @RequestParam(value = "page") int page,
                                                  @RequestParam(value = "size") int size) {
-        return ResponseEntity.ok(organizationService.getAll(username, fullName, inn, role, status, page, size));
+        return ResponseEntity.ok(organizationService.getAll(username, fullName, inn, role, active, page, size));
     }
 }

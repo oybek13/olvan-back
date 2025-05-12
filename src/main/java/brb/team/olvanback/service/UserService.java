@@ -4,6 +4,7 @@ import brb.team.olvanback.dto.CommonResponse;
 import brb.team.olvanback.dto.SignInRequest;
 import brb.team.olvanback.dto.SignUpRequest;
 import brb.team.olvanback.entity.User;
+import brb.team.olvanback.exception.DataNotFoundException;
 import brb.team.olvanback.repository.UserRepository;
 import brb.team.olvanback.utils.jwt.JwtGenerator;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -46,12 +50,15 @@ public class UserService {
     }
 
     public CommonResponse signIn(SignInRequest sign) {
+        List<String> roles = new ArrayList<>();
+        User user = userRepository.findByUsername(sign.getUsername()).orElseThrow(() -> new DataNotFoundException("Username not found: " + sign.getUsername()));
+        roles.add(user.getRole().toString());
         Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(sign.getUsername(), sign.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authenticate);
         return CommonResponse.builder()
                 .success(true)
                 .message("Sign in successful")
-                .data(jwtGenerator.generateToken(sign.getUsername()))
+                .data(jwtGenerator.generateToken(sign.getUsername(), roles, user.getId()))
                 .build();
     }
 
