@@ -10,9 +10,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class SignUpRequest {
+public class OrganizationResponse {
     private String username;
     private String password;
-    private String fullName;
     private UserRole role;
+    private String fullName;
+    private boolean isActive;
+    private String inn;
 }

@@ -35,6 +35,7 @@ public class UserService {
                 .username(sign.getUsername())
                 .password(passwordEncoder.encode(sign.getPassword()))
                 .role(sign.getRole())
+                .fullName(sign.getFullName())
                 .isActive(true)
                 .build());
         return CommonResponse.builder()

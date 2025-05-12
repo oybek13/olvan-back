@@ -31,28 +31,28 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "fullName", nullable = false)
+    @Column(name = "full_name", nullable = false)
     private String fullName;
 
-    @Column(name = "parentsFullName")
+    @Column(name = "parents_full_name")
     private String parentsFullName;
 
-    @Column(name = "pupilPhoneNumber")
+    @Column(name = "pupil_phone_number")
     private String pupilPhoneNumber;
 
-    @Column(name = "parentsPhoneNumber")
+    @Column(name = "parents_phone_number")
     private String parentsPhoneNumber;
 
     @Enumerated(EnumType.STRING)
     private EnrollType enrollType;
 
-    @Column(name = "dateBegin")
+    @Column(name = "date_begin")
     private String dateBegin;
 
     @Column(name = "inn", length = 9)
     private String inn;
 
-    @Column(name = "courseType", columnDefinition = "TEXT")
+    @Column(name = "course_type", columnDefinition = "TEXT")
     private String courseType;
 
     @Column(name = "degree")
@@ -67,7 +67,7 @@ public class User {
     @Column(name = "experience")
     private BigDecimal experience;
 
-    @Column(name = "studentCount")
+    @Column(name = "student_count")
     private Integer studentCount;
 
     @Column(name = "attendance")
@@ -81,6 +81,6 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "is_active")
     private boolean isActive;
 }

@@ -2,14 +2,22 @@ package brb.team.olvanback.service;
 
 import brb.team.olvanback.dto.CommonResponse;
 import brb.team.olvanback.dto.OrganizationRequest;
+import brb.team.olvanback.dto.PageResponse;
 import brb.team.olvanback.entity.User;
+import brb.team.olvanback.enums.UserRole;
 import brb.team.olvanback.exception.DataNotFoundException;
 import brb.team.olvanback.exception.UsernameAlreadyExistException;
+import brb.team.olvanback.mapper.Mapper;
 import brb.team.olvanback.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -78,4 +86,49 @@ public class OrganizationService {
                 .message("Organization deleted successfully!")
                 .build();
     }
+
+    public CommonResponse getAll(String username,
+                                 String fullName,
+                                 String inn,
+                                 UserRole role,
+                                 Boolean active,
+                                 int page,
+                                 int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        Specification<User> spec = Specification.where(null);
+        if (username != null && !username.isEmpty()) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("username")), "%" + username.toLowerCase() + "%"));
+        }
+        if (fullName != null && !fullName.isEmpty()) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("fullName")), "%" + fullName.toLowerCase() + "%"));
+        }
+        if (inn != null && !inn.isEmpty()) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("inn")), "%" + inn.toLowerCase() + "%"));
+        }
+        if (role != null && !role.toString().isEmpty()) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("role")), "%" + role + "%"));
+        }
+        if (active != null) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.equal(root.get("active"), active));
+        }
+
+        Page<User> userPage = userRepository.findAll(spec, pageable);
+
+        return CommonResponse.builder()
+                .success(true)
+                .message("Success!")
+                .data(PageResponse.builder()
+                        .page(page)
+                        .size(size)
+                        .totalElements(userPage.getTotalElements())
+                        .contents(Mapper.map(userPage.getContent()))
+                        .build())
+                .build();
+    }
+
 }
