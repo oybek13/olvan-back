@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class OrganizationResponse {
     private String username;
-    private String password;
     private UserRole role;
     private String fullName;
     private boolean isActive;

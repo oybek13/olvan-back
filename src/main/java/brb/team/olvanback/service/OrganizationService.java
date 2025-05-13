@@ -9,8 +9,10 @@ import brb.team.olvanback.exception.DataNotFoundException;
 import brb.team.olvanback.exception.UsernameAlreadyExistException;
 import brb.team.olvanback.mapper.Mapper;
 import brb.team.olvanback.repository.UserRepository;
+import brb.team.olvanback.specs.UserSpecification;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -20,6 +22,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -90,60 +95,19 @@ public class OrganizationService {
     public CommonResponse getAll(String username,
                                  String fullName,
                                  String inn,
-                                 UserRole role,
                                  Boolean active,
                                  int page,
                                  int size) {
-        // Validate pagination parameters
-        if (page < 0 && size <= 0) {
-            return CommonResponse.builder()
-                    .success(false)
-                    .message("Invalid pagination parameters: page must be >= 0 and size must be > 0")
-                    .data(null)
-                    .build();
-        }
-
-        // Create pageable object
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
-
-        // Build specification
-        Specification<User> spec = Specification.where(null);
-
-        // Add filters only if parameters are provided
-        if (username != null && !username.trim().isEmpty()) {
-            spec = spec.and((root, query, criteriaBuilder) ->
-                    criteriaBuilder.like(criteriaBuilder.lower(root.get("username")),
-                            "%" + username.trim().toLowerCase() + "%"));
-        }
-        if (fullName != null && !fullName.trim().isEmpty()) {
-            spec = spec.and((root, query, criteriaBuilder) ->
-                    criteriaBuilder.like(criteriaBuilder.lower(root.get("fullName")),
-                            "%" + fullName.trim().toLowerCase() + "%"));
-        }
-        if (inn != null && !inn.trim().isEmpty()) {
-            spec = spec.and((root, query, criteriaBuilder) ->
-                    criteriaBuilder.like(criteriaBuilder.lower(root.get("inn")),
-                            "%" + inn.trim().toLowerCase() + "%"));
-        }
-        if (role != null) {
-            spec = spec.and((root, query, criteriaBuilder) ->
-                    criteriaBuilder.equal(root.get("role"), role));
-        }
-        if (active != null) {
-            spec = spec.and((root, query, criteriaBuilder) ->
-                    criteriaBuilder.equal(root.get("isActive"), active));
-        }
-
-        // Query the repository
+        List<String> roles = new ArrayList<>();
+        roles.add(UserRole.ROLE_SCHOOL.name());
+        roles.add(UserRole.ROLE_EDUCATIONAL_CENTER.name());
+        Specification<User> spec = Specification.where(UserSpecification.hasRoleIn(roles))
+                .and(UserSpecification.hasUsername(username))
+                .and(UserSpecification.hasFullName(fullName))
+                .and(UserSpecification.hasInn(inn))
+                .and(UserSpecification.isActive(active));
         Page<User> userPage = userRepository.findAll(spec, pageable);
-
-        // Log for debugging
-        log.debug("Query executed with spec: username={}, fullName={}, inn={}, role={}, active={}, page={}, size={}",
-                username, fullName, inn, role, active, page, size);
-        log.debug("Result: totalElements={}, contentSize={}",
-                userPage.getTotalElements(), userPage.getContent().size());
-
-        // Build response
         return CommonResponse.builder()
                 .success(true)
                 .message("Success!")
@@ -155,5 +119,6 @@ public class OrganizationService {
                         .build())
                 .build();
     }
+
 
 }

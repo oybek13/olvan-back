@@ -12,7 +12,6 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity(name = "olvan_users")
 @AllArgsConstructor

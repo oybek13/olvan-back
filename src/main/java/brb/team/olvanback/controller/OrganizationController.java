@@ -47,13 +47,12 @@ public class OrganizationController {
 
     @GetMapping("/getAll")
     @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
-    public ResponseEntity<CommonResponse> getAll(@RequestParam(value = "username", required = false) String username,
+    public ResponseEntity<?> getAll(@RequestParam(value = "username", required = false) String username,
                                                  @RequestParam(value = "fullName", required = false) String fullName,
                                                  @RequestParam(value = "inn", required = false) String inn,
-                                                 @RequestParam(value = "role", required = false) UserRole role,
-                                                 @RequestParam(value = "active", required = false) boolean active,
+                                                 @RequestParam(value = "active") boolean active,
                                                  @RequestParam(value = "page") int page,
                                                  @RequestParam(value = "size") int size) {
-        return ResponseEntity.ok(organizationService.getAll(username, fullName, inn, role, active, page, size));
+        return ResponseEntity.ok(organizationService.getAll(username, fullName, inn, active, page, size));
     }
 }
