@@ -1,6 +1,7 @@
 package brb.team.olvanback.repository;
 
 import brb.team.olvanback.entity.User;
+import brb.team.olvanback.enums.UserRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
@@ -13,6 +14,8 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     boolean existsByUsername(String username);
 
     Optional<User> findById(Long id);
+
+    Optional<User> findByIdAndRoleIn(Long id, List<UserRole> roles);
 
     List<User> findByRoleIn(List<String> role);
 }

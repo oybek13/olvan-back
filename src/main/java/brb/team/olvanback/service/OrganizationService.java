@@ -55,7 +55,10 @@ public class OrganizationService {
     }
 
     public CommonResponse getOneOrganization(Long id) throws JsonProcessingException {
-        User user = userRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Organization not found with id: " + id));
+        List<UserRole> roles = new ArrayList<>();
+        roles.add(UserRole.ROLE_SCHOOL);
+        roles.add(UserRole.ROLE_EDUCATIONAL_CENTER);
+        User user = userRepository.findByIdAndRoleIn(id, roles).orElseThrow(() -> new DataNotFoundException("Organization not found with id: " + id));
         log.warn("Response from getOneOrganization: {}", objectMapper.writeValueAsString(user));
         return CommonResponse.builder()
                 .success(true)
