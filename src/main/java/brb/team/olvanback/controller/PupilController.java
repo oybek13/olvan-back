@@ -40,4 +40,17 @@ public class PupilController {
                                     @RequestParam(value = "dateBegin", required = false) String dateBegin) throws JsonProcessingException {
         return ResponseEntity.ok(pupilService.getAll(page, size, id, enrollType, status, dateBegin));
     }
+
+    @PutMapping("/{pupilId}")
+    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN', 'ROLE_ADMIN', 'ROLE_SCHOOL', 'ROLE_EDUCATIONAL_CENTER')")
+    public ResponseEntity<?> update(@PathVariable Long pupilId,
+                                    @RequestBody PupilRequest pupilRequest) throws JsonProcessingException {
+        return ResponseEntity.ok(pupilService.updatePupil(pupilRequest, pupilId));
+    }
+
+    @DeleteMapping("/{pupilId}")
+    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN', 'ROLE_ADMIN', 'ROLE_SCHOOL', 'ROLE_EDUCATIONAL_CENTER')")
+    public ResponseEntity<?> delete(@PathVariable Long pupilId) throws JsonProcessingException {
+        return ResponseEntity.ok(pupilService.deletePupil(pupilId));
+    }
 }

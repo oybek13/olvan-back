@@ -94,4 +94,37 @@ public class PupilService {
                         .build())
                 .build();
     }
+
+    public CommonResponse updatePupil(PupilRequest pupilRequest, Long id) throws JsonProcessingException {
+        User user = userRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Pupil not found with id: " + id));
+        user.setUsername(pupilRequest.getUsername());
+        user.setPassword(passwordEncoder.encode(pupilRequest.getPassword()));
+        user.setFullName(pupilRequest.getFullName());
+        user.setParentsFullName(pupilRequest.getParentsFullName());
+        user.setPupilPhoneNumber(pupilRequest.getPupilPhoneNumber());
+        user.setParentsPhoneNumber(pupilRequest.getParentsPhoneNumber());
+        user.setEnrollType(pupilRequest.getEnrollType());
+        user.setDateBegin(pupilRequest.getDateBegin());
+        user.setActive(pupilRequest.getStatus());
+        user.setAttendance(pupilRequest.getAttendance());
+        user.setCourseType(objectMapper.writeValueAsString(pupilRequest.getCourseType()));
+        User updatedPupil = userRepository.save(user);
+        log.warn("Pupil updated: {}", objectMapper.writeValueAsString(updatedPupil));
+        return CommonResponse.builder()
+                .success(true)
+                .message("Pupil updated successfully with id: " + id)
+                .build();
+    }
+
+    public CommonResponse deletePupil(Long id) throws JsonProcessingException {
+        User user = userRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Pupil not found with id: " + id));
+        userRepository.delete(user);
+        log.warn("Pupil deleted: {}", objectMapper.writeValueAsString(user));
+        return CommonResponse.builder()
+                .success(true)
+                .message("Pupil deleted successfully with id: " + id)
+                .build();
+    }
+
+
 }
