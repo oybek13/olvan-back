@@ -38,7 +38,7 @@ public class PupilController {
                                     @RequestParam(value = "enrollType", required = false) String enrollType,
                                     @RequestParam(value = "status", required = false) Boolean status,
                                     @RequestParam(value = "dateBegin", required = false) String dateBegin) throws JsonProcessingException {
-        return ResponseEntity.ok(pupilService.getAll(page, size, id, enrollType, status, dateBegin));
+        return ResponseEntity.ok(pupilService.getAllPupils(page, size, id, enrollType, status, dateBegin));
     }
 
     @PutMapping("/{pupilId}")

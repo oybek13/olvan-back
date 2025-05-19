@@ -1,7 +1,6 @@
 package brb.team.olvanback.service;
 
 import brb.team.olvanback.dto.CommonResponse;
-import brb.team.olvanback.dto.PageOrgResponse;
 import brb.team.olvanback.dto.PagePupilsResponse;
 import brb.team.olvanback.dto.PupilRequest;
 import brb.team.olvanback.entity.User;
@@ -43,7 +42,7 @@ public class PupilService {
                 .role(UserRole.ROLE_PUPIL)
                 .fullName(pupilRequest.getFullName())
                 .parentsFullName(pupilRequest.getParentsFullName())
-                .pupilPhoneNumber(pupilRequest.getPupilPhoneNumber())
+                .phoneNumber(pupilRequest.getPupilPhoneNumber())
                 .parentsPhoneNumber(pupilRequest.getParentsPhoneNumber())
                 .enrollType(pupilRequest.getEnrollType())
                 .dateBegin(pupilRequest.getDateBegin())
@@ -68,12 +67,12 @@ public class PupilService {
                 .build();
     }
 
-    public CommonResponse getAll(int page,
-                                 int size,
-                                 Long id,
-                                 String enrollType,
-                                 Boolean status,
-                                 String dateBegin) throws JsonProcessingException {
+    public CommonResponse getAllPupils(int page,
+                                       int size,
+                                       Long id,
+                                       String enrollType,
+                                       Boolean status,
+                                       String dateBegin) throws JsonProcessingException {
         Long orgId = jwtGenerator.extractOrgId(request.getHeader("Authorization").substring(7));
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
         Specification<User> spec = Specification.where(PupilSpecification.hasRole(UserRole.ROLE_PUPIL))
@@ -101,7 +100,7 @@ public class PupilService {
         user.setPassword(passwordEncoder.encode(pupilRequest.getPassword()));
         user.setFullName(pupilRequest.getFullName());
         user.setParentsFullName(pupilRequest.getParentsFullName());
-        user.setPupilPhoneNumber(pupilRequest.getPupilPhoneNumber());
+        user.setPhoneNumber(pupilRequest.getPupilPhoneNumber());
         user.setParentsPhoneNumber(pupilRequest.getParentsPhoneNumber());
         user.setEnrollType(pupilRequest.getEnrollType());
         user.setDateBegin(pupilRequest.getDateBegin());

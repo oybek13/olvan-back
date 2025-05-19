@@ -36,8 +36,8 @@ public class User {
     @Column(name = "parents_full_name")
     private String parentsFullName;
 
-    @Column(name = "pupil_phone_number")
-    private String pupilPhoneNumber;
+    @Column(name = "phone_number")
+    private String phoneNumber;
 
     @Column(name = "parents_phone_number")
     private String parentsPhoneNumber;
