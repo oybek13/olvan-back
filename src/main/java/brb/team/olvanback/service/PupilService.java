@@ -20,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +37,9 @@ public class PupilService {
 
     public CommonResponse createPupil(PupilRequest pupilRequest) throws JsonProcessingException {
         Long orgId = jwtGenerator.extractOrgId(request.getHeader("Authorization").substring(7));
+        if (userRepository.existsByUsername(pupilRequest.getUsername())) {
+            throw new UsernameNotFoundException("Username " + pupilRequest.getUsername() + " already exists");
+        }
         User pupil = userRepository.save(User.builder()
                 .username(pupilRequest.getUsername())
                 .password(passwordEncoder.encode(pupilRequest.getPassword()))

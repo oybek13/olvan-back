@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/org")
-@Tag(name = "Organization")
+@Tag(name = "Organizations")
 @CrossOrigin
 @RequiredArgsConstructor
 public class OrganizationController {

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/pupil")
-@Tag(name = "Pupil")
+@Tag(name = "Pupils")
 @CrossOrigin
 @RequiredArgsConstructor
 public class PupilController {

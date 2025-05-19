@@ -6,5 +6,6 @@ public enum UserRole {
     ROLE_SCHOOL,
     ROLE_EDUCATIONAL_CENTER,
     ROLE_PARENT,
-    ROLE_PUPIL
+    ROLE_PUPIL,
+    ROLE_TEACHER
 }
