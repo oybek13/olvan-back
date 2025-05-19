@@ -2,17 +2,16 @@ package brb.team.olvanback.service;
 
 import brb.team.olvanback.dto.CommonResponse;
 import brb.team.olvanback.dto.OrganizationRequest;
-import brb.team.olvanback.dto.PageResponse;
+import brb.team.olvanback.dto.PageOrgResponse;
 import brb.team.olvanback.entity.User;
 import brb.team.olvanback.enums.UserRole;
 import brb.team.olvanback.exception.DataNotFoundException;
 import brb.team.olvanback.exception.UsernameAlreadyExistException;
 import brb.team.olvanback.mapper.Mapper;
 import brb.team.olvanback.repository.UserRepository;
-import brb.team.olvanback.specs.UserSpecification;
+import brb.team.olvanback.specs.OrgSpecification;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -63,7 +62,7 @@ public class OrganizationService {
         return CommonResponse.builder()
                 .success(true)
                 .message("Success!")
-                .data(Mapper.map(user))
+                .data(Mapper.mapOrg(user))
                 .build();
     }
 
@@ -105,20 +104,20 @@ public class OrganizationService {
         List<String> roles = new ArrayList<>();
         roles.add(UserRole.ROLE_SCHOOL.name());
         roles.add(UserRole.ROLE_EDUCATIONAL_CENTER.name());
-        Specification<User> spec = Specification.where(UserSpecification.hasRoleIn(roles))
-                .and(UserSpecification.hasUsername(username))
-                .and(UserSpecification.hasFullName(fullName))
-                .and(UserSpecification.hasInn(inn))
-                .and(UserSpecification.isActive(active));
+        Specification<User> spec = Specification.where(OrgSpecification.hasRoleIn(roles))
+                .and(OrgSpecification.hasUsername(username))
+                .and(OrgSpecification.hasFullName(fullName))
+                .and(OrgSpecification.hasInn(inn))
+                .and(OrgSpecification.isActive(active));
         Page<User> userPage = userRepository.findAll(spec, pageable);
         return CommonResponse.builder()
                 .success(true)
                 .message("Success!")
-                .data(PageResponse.builder()
+                .data(PageOrgResponse.builder()
                         .page(page)
                         .size(size)
                         .totalElements(userPage.getTotalElements())
-                        .contents(Mapper.map(userPage.getContent()))
+                        .contents(Mapper.mapOrgs(userPage.getContent()))
                         .build())
                 .build();
     }

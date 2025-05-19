@@ -1,6 +1,5 @@
 package brb.team.olvanback.dto;
 
-import brb.team.olvanback.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,9 +11,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PageResponse {
+public class PagePupilsResponse {
     private int page;
     private int size;
     private long totalElements;
-    private List<OrganizationResponse> contents;
+    private List<PupilResponse> contents;
 }

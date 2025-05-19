@@ -57,6 +57,11 @@ public class JwtGenerator {
         return extractClaim(token, Claims::getSubject);
     }
 
+    public Long extractOrgId(String token) {
+        Object orgIdObj = extractAllClaims(token).get("orgId");
+        return orgIdObj != null ? Long.valueOf(orgIdObj.toString()) : null;
+    }
+
     private <T> T extractClaim(String token, Function<Claims, T> claimResolver) {
         final Claims claims = extractAllClaims(token);
         return claimResolver.apply(claims);

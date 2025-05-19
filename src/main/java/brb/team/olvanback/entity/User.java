@@ -82,4 +82,7 @@ public class User {
 
     @Column(nullable = false, name = "is_active")
     private boolean isActive;
+
+    @Column(name = "org_id")
+    private Long orgId;
 }

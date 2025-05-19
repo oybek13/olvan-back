@@ -16,6 +16,4 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     Optional<User> findById(Long id);
 
     Optional<User> findByIdAndRoleIn(Long id, List<UserRole> roles);
-
-    List<User> findByRoleIn(List<String> role);
 }

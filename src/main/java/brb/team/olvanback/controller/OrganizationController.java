@@ -45,7 +45,7 @@ public class OrganizationController {
         return ResponseEntity.ok(organizationService.deleteOrganization(orgId));
     }
 
-    @GetMapping("/getAll")
+    @GetMapping("/all")
     @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
     public ResponseEntity<?> getAll(@RequestParam(value = "username", required = false) String username,
                                                  @RequestParam(value = "fullName", required = false) String fullName,

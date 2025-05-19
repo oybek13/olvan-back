@@ -1,6 +1,7 @@
 package brb.team.olvanback.exception;
 
 import brb.team.olvanback.dto.CommonResponse;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -28,4 +29,5 @@ public class ExceptionHandlerAdvice {
         body.put("message", ex.getMostSpecificCause().getMessage());
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
+
 }

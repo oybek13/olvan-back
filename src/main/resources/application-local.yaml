@@ -4,7 +4,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/olvanbackdb
     username: postgres
-    password: "0000"
+    password: "1313"
   jpa:
     hibernate:
       ddl-auto: none # don't touch, it gonna be disaster if you change!

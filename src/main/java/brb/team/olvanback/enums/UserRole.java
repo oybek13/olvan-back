@@ -5,6 +5,6 @@ public enum UserRole {
     ROLE_ADMIN,
     ROLE_SCHOOL,
     ROLE_EDUCATIONAL_CENTER,
-    ROLE_PARENTS,
-    ROLE_PUPILS
+    ROLE_PARENT,
+    ROLE_PUPIL
 }

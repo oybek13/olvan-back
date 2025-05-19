@@ -6,7 +6,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 
-public class UserSpecification {
+public class OrgSpecification {
 
     public static Specification<User> hasRoleIn(List<String> roles) {
         return (root, query, cb) -> roles == null || roles.isEmpty()
@@ -37,15 +37,6 @@ public class UserSpecification {
                 return cb.conjunction();
             }
             return cb.equal(root.get("inn"), inn);
-        };
-    }
-
-    public static Specification<User> hasRole(UserRole role) {
-        return (root, query, cb) -> {
-            if (role == null) {
-                return cb.conjunction();
-            }
-            return cb.equal(root.get("role"), role);
         };
     }
 
