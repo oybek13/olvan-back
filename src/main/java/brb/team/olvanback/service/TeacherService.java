@@ -66,7 +66,7 @@ public class TeacherService {
     }
 
     public CommonResponse getOneTeacher(Long id) throws JsonProcessingException {
-        User user = userRepository.findByIdAndRole(id, UserRole.ROLE_TEACHER).orElseThrow(() -> new DataNotFoundException("Teacher not found with id: " + id));
+        User user = userRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Teacher not found with id: " + id));
         return CommonResponse.builder()
                 .success(true)
                 .message("Success!")
