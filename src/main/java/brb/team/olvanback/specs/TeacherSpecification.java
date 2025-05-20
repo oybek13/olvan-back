@@ -4,7 +4,25 @@ import brb.team.olvanback.entity.User;
 import brb.team.olvanback.enums.UserRole;
 import org.springframework.data.jpa.domain.Specification;
 
-public class PupilSpecification {
+public class TeacherSpecification {
+
+    public static Specification<User> hasUsername(String username) {
+        return (root, query, cb) -> {
+            if (username == null || username.isEmpty()) {
+                return cb.conjunction();
+            }
+            return cb.like(cb.lower(root.get("username")), "%" + username.toLowerCase() + "%");
+        };
+    }
+
+    public static Specification<User> hasFullName(String fullName) {
+        return (root, query, cb) -> {
+            if (fullName == null || fullName.isEmpty()) {
+                return cb.conjunction();
+            }
+            return cb.like(cb.lower(root.get("fullName")), "%" + fullName.toLowerCase() + "%");
+        };
+    }
 
     public static Specification<User> hasDateBegin(String dateBegin) {
         return (root, query, cb) -> {
@@ -57,6 +75,24 @@ public class PupilSpecification {
                 return cb.conjunction();
             }
             return cb.like(cb.lower(root.get("enrollType")), "%" + enrollType.toLowerCase() + "%");
+        };
+    }
+
+    public static Specification<User> hasPhoneNumber(String phoneNumber) {
+        return (root, query, cb) -> {
+            if (phoneNumber == null || phoneNumber.isEmpty()) {
+                return cb.conjunction();
+            }
+            return cb.like(cb.lower(root.get("phoneNumber")), "%" + phoneNumber.toLowerCase() + "%");
+        };
+    }
+
+    public static Specification<User> hasStudentCount(Integer studentCount) {
+        return (root, query, cb) -> {
+            if (studentCount == null) {
+                return cb.conjunction();
+            }
+            return cb.equal(root.get("studentCount"), studentCount);
         };
     }
 }

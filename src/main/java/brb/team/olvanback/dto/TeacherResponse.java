@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -12,9 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TeacherRequest {
+public class TeacherResponse implements Serializable {
     private String username;
-    private String password;
     private String fullName;
     private String degree;
     private String phoneNumber;
@@ -23,6 +23,6 @@ public class TeacherRequest {
     private String dateBegin;
     private Boolean status;
     private BigDecimal experience;
-    private Integer studentCount;
     private List<String> courseType;
+    private Integer studentCount;
 }

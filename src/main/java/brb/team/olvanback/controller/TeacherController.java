@@ -23,4 +23,36 @@ public class TeacherController {
     public ResponseEntity<?> create(@RequestBody TeacherRequest teacherRequest) throws JsonProcessingException {
         return ResponseEntity.ok(teacherService.createTeacher(teacherRequest));
     }
+
+    @GetMapping("/{teacherId}")
+    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN', 'ROLE_ADMIN', 'ROLE_SCHOOL', 'ROLE_EDUCATIONAL_CENTER')")
+    public ResponseEntity<?> getOne(@PathVariable Long teacherId) throws JsonProcessingException {
+        return ResponseEntity.ok(teacherService.getOneTeacher(teacherId));
+    }
+
+    @GetMapping("/all")
+    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN', 'ROLE_ADMIN', 'ROLE_SCHOOL', 'ROLE_EDUCATIONAL_CENTER')")
+    public ResponseEntity<?> getAll(@RequestParam(value = "page") int page,
+                                    @RequestParam(value = "size") int size,
+                                    @RequestParam(value = "fullName", required = false) String fullName,
+                                    @RequestParam(value = "phoneNumber", required = false) String phoneNumber,
+                                    @RequestParam(value = "status", required = false) Boolean status,
+                                    @RequestParam(value = "dateBegin", required = false) String dateBegin,
+                                    @RequestParam(value = "studentCount", required = false) Integer studentCount) throws JsonProcessingException {
+        return ResponseEntity.ok(teacherService.getAllTeachers(page, size, fullName, phoneNumber, status, dateBegin, studentCount));
+    }
+
+    @DeleteMapping("/{teacherId}")
+    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN', 'ROLE_ADMIN', 'ROLE_SCHOOL', 'ROLE_EDUCATIONAL_CENTER')")
+    public ResponseEntity<?> delete(@PathVariable Long teacherId) throws JsonProcessingException {
+        return ResponseEntity.ok(teacherService.deleteTeacher(teacherId));
+    }
+
+    @PutMapping("/{teacherId}")
+    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN', 'ROLE_ADMIN', 'ROLE_SCHOOL', 'ROLE_EDUCATIONAL_CENTER')")
+    public ResponseEntity<?> update(@PathVariable Long teacherId, @RequestBody TeacherRequest teacherRequest) throws JsonProcessingException {
+        return ResponseEntity.ok(teacherService.updateTeacher(teacherId, teacherRequest));
+    }
+
+
 }

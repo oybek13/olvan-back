@@ -120,7 +120,7 @@ public class PupilService {
     }
 
     public CommonResponse deletePupil(Long id) throws JsonProcessingException {
-        User user = userRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Pupil not found with id: " + id));
+        User user = userRepository.findByIdAndRole(id, UserRole.ROLE_PUPIL).orElseThrow(() -> new DataNotFoundException("Pupil not found with id: " + id));
         userRepository.delete(user);
         log.warn("Pupil deleted: {}", objectMapper.writeValueAsString(user));
         return CommonResponse.builder()

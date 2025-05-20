@@ -2,6 +2,7 @@ package brb.team.olvanback.mapper;
 
 import brb.team.olvanback.dto.OrganizationResponse;
 import brb.team.olvanback.dto.PupilResponse;
+import brb.team.olvanback.dto.TeacherResponse;
 import brb.team.olvanback.entity.User;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,7 +15,7 @@ import java.util.List;
 @Slf4j
 public class Mapper {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static ObjectMapper objectMapper = new ObjectMapper();
 
     public static List<OrganizationResponse> mapOrgs(List<User> users) {
         List<OrganizationResponse> list = new ArrayList<>();
@@ -73,6 +74,43 @@ public class Mapper {
                     .status(user.isActive())
                     .build();
             list.add(pupil);
+        }
+        return list;
+    }
+
+    public static TeacherResponse mapTeacher(User user) throws JsonProcessingException {
+        return TeacherResponse.builder()
+                .username(user.getUsername())
+                .fullName(user.getFullName())
+                .degree(user.getDegree())
+                .phoneNumber(user.getPhoneNumber())
+                .gender(user.getGender())
+                .email(user.getEmail())
+                .dateBegin(user.getDateBegin())
+                .status(user.isActive())
+                .experience(user.getExperience())
+                .courseType(Arrays.asList(objectMapper.readValue(user.getCourseType(), String[].class)))
+                .studentCount(user.getStudentCount())
+                .build();
+    }
+
+    public static List<TeacherResponse> mapTeachers(List<User> content) throws JsonProcessingException {
+        List<TeacherResponse> list = new ArrayList<>();
+        for (User user : content) {
+            TeacherResponse teacher = TeacherResponse.builder()
+                    .username(user.getUsername())
+                    .fullName(user.getFullName())
+                    .degree(user.getDegree())
+                    .phoneNumber(user.getPhoneNumber())
+                    .gender(user.getGender())
+                    .email(user.getEmail())
+                    .dateBegin(user.getDateBegin())
+                    .status(user.isActive())
+                    .experience(user.getExperience())
+                    .courseType(Arrays.asList(objectMapper.readValue(user.getCourseType(), String[].class)))
+                    .studentCount(user.getStudentCount())
+                    .build();
+            list.add(teacher);
         }
         return list;
     }
