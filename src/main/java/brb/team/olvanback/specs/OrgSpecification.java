@@ -8,17 +8,20 @@ import java.util.List;
 
 public class OrgSpecification {
 
-    public static Specification<User> hasRoleIn(List<String> roles) {
-        return (root, query, cb) -> roles == null || roles.isEmpty()
-                ? cb.conjunction()
-                : root.get("role").in(roles);
-    }
-    public static Specification<User> hasUsername(String username) {
+    public static Specification<User> hasRoleIn(String role) {
         return (root, query, cb) -> {
-            if (username == null || username.isEmpty()) {
+            if (role == null || role.isEmpty()) {
                 return cb.conjunction();
             }
-            return cb.like(cb.lower(root.get("username")), "%" + username.toLowerCase() + "%");
+            return cb.equal(root.get("role"), role);
+        };
+    }
+    public static Specification<User> hasAddress(String address) {
+        return (root, query, cb) -> {
+            if (address == null || address.isEmpty()) {
+                return cb.conjunction();
+            }
+            return cb.like(cb.lower(root.get("address")), "%" + address.toLowerCase() + "%");
         };
     }
 

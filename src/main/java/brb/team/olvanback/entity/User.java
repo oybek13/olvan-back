@@ -85,4 +85,7 @@ public class User {
 
     @Column(name = "org_id")
     private Long orgId;
+
+    @Column(name = "address", columnDefinition = "TEXT")
+    private String address;
 }

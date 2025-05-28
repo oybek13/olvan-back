@@ -19,7 +19,7 @@ server:
   port: 6363
 env:
   url:
-    name: http://localhost:6363
+    name: http://192.168.214.40:6363
     description: "Local Server"
 logging:
   level:
@@ -27,3 +27,8 @@ logging:
 jwt:
   secret: OlvanProjectAboutEducation134567890098765434567898765DFGHJKRTYUIcvbnmghjkuytttyuioqwertyuiolkkjgfdszxcvbnm
   expiry: 604800000 #milliseconds = 7 days
+minio:
+  url: http://192.168.214.40:9000
+  bucket: olvan-bucket
+  username: oybek13
+  password: oybek13#

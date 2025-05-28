@@ -9,15 +9,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class OrganizationRequest {
-    private String username;
-    private String password;
+public class OrganizationsResponse {
+    private Long id;
     private String fullName;
-    private String phoneNumber;
-    private String directorPhoneNumber;
-    private String directorFullName;
+    private boolean isActive;
     private String dateBegin;
     private String address;
-    private String inn;
-    private Boolean isActive;
+    private Integer studentCount;
+    private Integer teacherCount;
 }

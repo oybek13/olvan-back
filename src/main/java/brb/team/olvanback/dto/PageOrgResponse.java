@@ -15,5 +15,5 @@ public class PageOrgResponse {
     private int page;
     private int size;
     private long totalElements;
-    private List<OrganizationResponse> contents;
+    private List<OrganizationsResponse> contents;
 }

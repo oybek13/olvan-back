@@ -31,11 +31,9 @@ public class ExceptionHandlerAdvice {
     public ResponseEntity<CommonResponse<?>> handleAll(Exception e, HttpServletRequest req) {
         log.error("❌ Exception at [{} {}]: {}", req.getMethod(), req.getRequestURI(), e.getMessage(), e);
         if (e instanceof AuthenticationException || e instanceof AccessDeniedException) {
-            // Pass, security already handled
             throw (RuntimeException) e;
         }
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new CommonResponse<>(false, "Error: " + e.getMessage(), null));
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new CommonResponse<>(false, "Error: " + e.getMessage(), null));
     }
 
 }

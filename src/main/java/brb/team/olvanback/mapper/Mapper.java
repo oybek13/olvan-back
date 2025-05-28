@@ -1,43 +1,65 @@
 package brb.team.olvanback.mapper;
 
 import brb.team.olvanback.dto.OrganizationResponse;
+import brb.team.olvanback.dto.OrganizationsResponse;
 import brb.team.olvanback.dto.PupilResponse;
 import brb.team.olvanback.dto.TeacherResponse;
+import brb.team.olvanback.entity.Contract;
 import brb.team.olvanback.entity.User;
+import brb.team.olvanback.enums.UserRole;
+import brb.team.olvanback.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
+@Service
 public class Mapper {
 
     private static ObjectMapper objectMapper = new ObjectMapper();
+    private final UserRepository userRepository;
 
-    public static List<OrganizationResponse> mapOrgs(List<User> users) {
-        List<OrganizationResponse> list = new ArrayList<>();
+    public Mapper(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    public List<OrganizationsResponse> mapOrgs(List<User> users) {
+        List<OrganizationsResponse> list = new ArrayList<>();
         for (User user : users) {
-            list.add(OrganizationResponse.builder()
+            Integer pupilCount = userRepository.countByOrgIdAndRole(user.getId(), UserRole.ROLE_PUPIL);
+            Integer teacherCount = userRepository.countByOrgIdAndRole(user.getId(), UserRole.ROLE_TEACHER);
+            list.add(OrganizationsResponse.builder()
+                    .id(user.getId())
                     .fullName(user.getFullName())
-                    .username(user.getUsername())
-                    .inn(user.getInn())
-                    .role(user.getRole())
                     .isActive(user.isActive())
+                    .dateBegin(user.getDateBegin())
+                    .address(user.getAddress())
+                    .studentCount(pupilCount)
+                    .teacherCount(teacherCount)
                     .build());
         }
         return list;
     }
 
-    public static OrganizationResponse mapOrg(User user) {
+    public static OrganizationResponse mapOrg(User user, Contract contract) {
         return OrganizationResponse.builder()
+                .id(user.getId())
                 .username(user.getUsername())
+                .password(user.getPassword())
                 .fullName(user.getFullName())
+                .phoneNumber(user.getPhoneNumber())
+                .directorPhoneNumber(user.getParentsPhoneNumber())
+                .directorFullName(user.getParentsFullName())
+                .dateBegin(user.getDateBegin())
+                .address(user.getAddress())
                 .inn(user.getInn())
-                .role(user.getRole())
-                .isActive(user.isActive())
+                .status(user.isActive())
+                .contract(contract)
                 .build();
     }
 

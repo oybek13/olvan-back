@@ -3,17 +3,22 @@ package brb.team.olvanback.service;
 import brb.team.olvanback.dto.CommonResponse;
 import brb.team.olvanback.dto.OrganizationRequest;
 import brb.team.olvanback.dto.PageOrgResponse;
+import brb.team.olvanback.entity.Contract;
 import brb.team.olvanback.entity.User;
 import brb.team.olvanback.enums.UserRole;
 import brb.team.olvanback.exception.DataNotFoundException;
 import brb.team.olvanback.exception.UsernameAlreadyExistException;
 import brb.team.olvanback.mapper.Mapper;
+import brb.team.olvanback.repository.ContractRepository;
 import brb.team.olvanback.repository.UserRepository;
+import brb.team.olvanback.service.extra.MinioService;
 import brb.team.olvanback.specs.OrgSpecification;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.minio.errors.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,9 +26,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -33,8 +43,16 @@ public class OrganizationService {
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
     private final PasswordEncoder passwordEncoder;
+    private final MinioService minioService;
+    private final ContractRepository contractRepository;
+    private final Mapper mapper;
+    @Value("${minio.url}")
+    private String url;
+    @Value("${minio.bucket}")
+    private String bucket;
 
-    public CommonResponse createOrganization(OrganizationRequest request) throws JsonProcessingException {
+    public CommonResponse createOrganization(String organization, MultipartFile contract) throws Exception {
+        OrganizationRequest request = objectMapper.readValue(organization, OrganizationRequest.class);
         if (userRepository.existsByUsername(request.getUsername()))
             throw new UsernameAlreadyExistException("Username already exist: " + request.getUsername());
         log.info("Request to create organization: {}", objectMapper.writeValueAsString(request));
@@ -42,41 +60,75 @@ public class OrganizationService {
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .fullName(request.getFullName())
+                .phoneNumber(request.getPhoneNumber())
+                .parentsPhoneNumber(request.getDirectorPhoneNumber())
+                .parentsFullName(request.getDirectorFullName())
+                .dateBegin(request.getDateBegin())
+                .address(request.getAddress())
                 .inn(request.getInn())
-                .role(request.getRole())
-                .isActive(request.isActive())
+                .role(UserRole.ROLE_SCHOOL)
+                .isActive(request.getIsActive())
                 .build());
         log.info("Response after creating organization: {}", objectMapper.writeValueAsString(savedUser));
+        uploadContract(contract, savedUser);
         return CommonResponse.builder()
                 .success(true)
                 .message("Organization created successfully!")
                 .build();
     }
 
+    private void uploadContract(MultipartFile file, User user) throws Exception {
+        // Generate the object name (e.g., the file name) that will be stored in the bucket
+        String objectName = file.getOriginalFilename();
+        minioService.sendingTheFileToMinio(file);
+        if (contractRepository.existsByUserId(user.getId())) {
+            Contract contract = contractRepository.findByUserId(user.getId()).orElse(null);
+            contract.setFileName(objectName);
+            contract.setFilePath(url + "/" + bucket + "/" + objectName);
+            contract.setFileSize(file.getSize());
+            Contract updatedContract = contractRepository.save(contract);
+            log.warn("Contract updated successfully: {}", objectMapper.writeValueAsString(updatedContract));
+        } else {
+            Contract entity = contractRepository.save(Contract.builder()
+                    .fileName(objectName)
+                    .filePath(url + "/" + bucket + "/" + objectName)
+                    .fileSize(file.getSize())
+                    .user(user)
+                    .build());
+            log.warn("Contract saved successfully: {}", objectMapper.writeValueAsString(entity));
+        }
+    }
+
     public CommonResponse getOneOrganization(Long id) throws JsonProcessingException {
-        List<UserRole> roles = new ArrayList<>();
-        roles.add(UserRole.ROLE_SCHOOL);
-        roles.add(UserRole.ROLE_EDUCATIONAL_CENTER);
-        User user = userRepository.findByIdAndRoleIn(id, roles).orElseThrow(() -> new DataNotFoundException("Organization not found with id: " + id));
+        User user = userRepository.findByIdAndRole(id, UserRole.ROLE_SCHOOL).orElseThrow(() -> new DataNotFoundException("Organization not found with id: " + id));
         log.warn("Response from getOneOrganization: {}", objectMapper.writeValueAsString(user));
+        Contract contract = contractRepository.findByUserId(user.getId()).orElse(null);
         return CommonResponse.builder()
                 .success(true)
                 .message("Success!")
-                .data(Mapper.mapOrg(user))
+                .data(Mapper.mapOrg(user, contract))
                 .build();
     }
 
-    public CommonResponse editOrganization(OrganizationRequest request, Long id) throws JsonProcessingException {
+    public CommonResponse editOrganization(String data, MultipartFile contract, Long id) throws Exception {
+        OrganizationRequest request = objectMapper.readValue(data, OrganizationRequest.class);
         log.info("Request to edit organization: {} \t {}", objectMapper.writeValueAsString(request), id);
         User user = userRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Organization not found with id: " + id));
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setFullName(request.getFullName());
+        user.setPhoneNumber(request.getPhoneNumber());
+        user.setParentsPhoneNumber(request.getDirectorPhoneNumber());
+        user.setParentsFullName(request.getDirectorFullName());
+        user.setDateBegin(request.getDateBegin());
+        user.setAddress(request.getAddress());
         user.setInn(request.getInn());
-        user.setRole(request.getRole());
-        user.setActive(request.isActive());
+        user.setActive(request.getIsActive());
         User editedUser = userRepository.save(user);
         log.info("Response after editing organization: {}", objectMapper.writeValueAsString(editedUser));
+        if (contract != null) {
+            uploadContract(contract, editedUser);
+        }
         return CommonResponse.builder()
                 .success(true)
                 .message("Organization edited successfully!")
@@ -94,18 +146,15 @@ public class OrganizationService {
                 .build();
     }
 
-    public CommonResponse getAll(String username,
+    public CommonResponse getAll(String address,
                                  String fullName,
                                  String inn,
                                  Boolean active,
                                  int page,
                                  int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
-        List<String> roles = new ArrayList<>();
-        roles.add(UserRole.ROLE_SCHOOL.name());
-        roles.add(UserRole.ROLE_EDUCATIONAL_CENTER.name());
-        Specification<User> spec = Specification.where(OrgSpecification.hasRoleIn(roles))
-                .and(OrgSpecification.hasUsername(username))
+        Specification<User> spec = Specification.where(OrgSpecification.hasRoleIn(UserRole.ROLE_SCHOOL.name()))
+                .and(OrgSpecification.hasAddress(address))
                 .and(OrgSpecification.hasFullName(fullName))
                 .and(OrgSpecification.hasInn(inn))
                 .and(OrgSpecification.isActive(active));
@@ -117,7 +166,7 @@ public class OrganizationService {
                         .page(page)
                         .size(size)
                         .totalElements(userPage.getTotalElements())
-                        .contents(Mapper.mapOrgs(userPage.getContent()))
+                        .contents(mapper.mapOrgs(userPage.getContent()))
                         .build())
                 .build();
     }

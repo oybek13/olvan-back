@@ -1,6 +1,6 @@
 package brb.team.olvanback.dto;
 
-import brb.team.olvanback.enums.UserRole;
+import brb.team.olvanback.entity.Contract;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,9 +11,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class OrganizationResponse {
+    private Long id;
     private String username;
-    private UserRole role;
+    private String password;
     private String fullName;
-    private boolean isActive;
+    private String phoneNumber;
+    private String directorPhoneNumber;
+    private String directorFullName;
+    private String dateBegin;
+    private String address;
+    private Boolean status;
     private String inn;
+    private Contract contract;
 }
