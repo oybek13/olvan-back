@@ -28,7 +28,7 @@ jwt:
   secret: OlvanProjectAboutEducation134567890098765434567898765DFGHJKRTYUIcvbnmghjkuytttyuioqwertyuiolkkjgfdszxcvbnm
   expiry: 604800000 #milliseconds = 7 days
 minio:
-  url: http://127.0.0.1:9000
+  url: http://188.245.193.2:9000
   bucket: olvan-bucket
-  username: oybek13
-  password: oybek13#
+  username: minioadmin
+  password: minioadmin123

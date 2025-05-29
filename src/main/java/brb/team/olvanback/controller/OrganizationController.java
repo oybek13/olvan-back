@@ -1,11 +1,8 @@
 package brb.team.olvanback.controller;
 
 import brb.team.olvanback.dto.CommonResponse;
-import brb.team.olvanback.dto.OrganizationRequest;
-import brb.team.olvanback.enums.UserRole;
 import brb.team.olvanback.service.OrganizationService;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import io.minio.errors.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -13,10 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 
 @RestController
 @RequestMapping("/org")
