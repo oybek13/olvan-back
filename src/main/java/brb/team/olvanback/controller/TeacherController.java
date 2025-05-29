@@ -26,7 +26,7 @@ public class TeacherController {
 
     @GetMapping("/{teacherId}")
     @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN', 'ROLE_SCHOOL')")
-    public ResponseEntity<?> getOne(@PathVariable Long teacherId) throws JsonProcessingException {
+    public ResponseEntity<?> getOne(@PathVariable(value = "teacherId") Long teacherId) throws JsonProcessingException {
         return ResponseEntity.ok(teacherService.getOneTeacher(teacherId));
     }
 
@@ -44,13 +44,13 @@ public class TeacherController {
 
     @DeleteMapping("/{teacherId}")
     @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN', 'ROLE_SCHOOL')")
-    public ResponseEntity<?> delete(@PathVariable Long teacherId) throws JsonProcessingException {
+    public ResponseEntity<?> delete(@PathVariable(value = "teacherId") Long teacherId) throws JsonProcessingException {
         return ResponseEntity.ok(teacherService.deleteTeacher(teacherId));
     }
 
     @PutMapping("/{teacherId}")
     @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN', 'ROLE_SCHOOL')")
-    public ResponseEntity<?> update(@PathVariable Long teacherId, @RequestBody TeacherRequest teacherRequest) throws JsonProcessingException {
+    public ResponseEntity<?> update(@PathVariable(value = "teacherId") Long teacherId, @RequestBody TeacherRequest teacherRequest) throws JsonProcessingException {
         return ResponseEntity.ok(teacherService.updateTeacher(teacherId, teacherRequest));
     }
 

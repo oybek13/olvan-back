@@ -29,13 +29,13 @@ public class OrganizationController {
 
     @GetMapping("/{orgId}")
     @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
-    public ResponseEntity<CommonResponse> getOne(@PathVariable long orgId) throws JsonProcessingException {
+    public ResponseEntity<CommonResponse> getOne(@PathVariable(value = "orgId") Long orgId) throws JsonProcessingException {
         return ResponseEntity.ok(organizationService.getOneOrganization(orgId));
     }
 
     @PutMapping(value = "/{orgId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
-    public ResponseEntity<CommonResponse> update(@PathVariable long orgId,
+    public ResponseEntity<CommonResponse> update(@PathVariable(value = "orgId") Long orgId,
                                                  @RequestParam(value = "data") String data,
                                                  @RequestParam(value = "contract", required = false) MultipartFile contract) throws Exception {
         return ResponseEntity.ok(organizationService.editOrganization(data, contract, orgId));
@@ -43,7 +43,7 @@ public class OrganizationController {
 
     @DeleteMapping("/{orgId}")
     @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
-    public ResponseEntity<CommonResponse> delete(@PathVariable long orgId) {
+    public ResponseEntity<CommonResponse> delete(@PathVariable(value = "orgId") Long orgId) {
         return ResponseEntity.ok(organizationService.deleteOrganization(orgId));
     }
 

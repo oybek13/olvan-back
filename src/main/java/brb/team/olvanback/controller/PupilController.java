@@ -43,14 +43,14 @@ public class PupilController {
 
     @PutMapping("/{pupilId}")
     @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN', 'ROLE_SCHOOL')")
-    public ResponseEntity<?> update(@PathVariable Long pupilId,
+    public ResponseEntity<?> update(@PathVariable(value = "pupilId") Long pupilId,
                                     @RequestBody PupilRequest pupilRequest) throws JsonProcessingException {
         return ResponseEntity.ok(pupilService.updatePupil(pupilRequest, pupilId));
     }
 
     @DeleteMapping("/{pupilId}")
     @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN', 'ROLE_SCHOOL')")
-    public ResponseEntity<?> delete(@PathVariable Long pupilId) throws JsonProcessingException {
+    public ResponseEntity<?> delete(@PathVariable(value = "pupilId") Long pupilId) throws JsonProcessingException {
         return ResponseEntity.ok(pupilService.deletePupil(pupilId));
     }
 }
