@@ -24,4 +24,5 @@ public class PupilRequest {
     private Boolean status;
     private Integer attendance;
     private List<String> courseType;
+    private String teacherName;
 }

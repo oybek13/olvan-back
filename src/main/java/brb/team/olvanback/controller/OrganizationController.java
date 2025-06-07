@@ -1,6 +1,7 @@
 package brb.team.olvanback.controller;
 
 import brb.team.olvanback.dto.CommonResponse;
+import brb.team.olvanback.dto.OrganizationAccountRequest;
 import brb.team.olvanback.service.OrganizationService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -56,5 +57,26 @@ public class OrganizationController {
                                     @RequestParam(value = "page") int page,
                                     @RequestParam(value = "size") int size) {
         return ResponseEntity.ok(organizationService.getAll(address, fullName, inn, active, page, size));
+    }
+
+    @GetMapping("/account")
+    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN', 'ROLE_SCHOOL')")
+    public ResponseEntity<?> getOneAccount() {
+        return ResponseEntity.ok(organizationService.getOneAccount());
+    }
+
+    @PutMapping("/updateAccount/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN', 'ROLE_SCHOOL')")
+    public ResponseEntity<?> updateAccount(@PathVariable Long id,
+                                           @RequestBody OrganizationAccountRequest request) throws JsonProcessingException {
+        return ResponseEntity.ok(organizationService.updateAccount(id, request));
+    }
+
+    @PutMapping("/changePassword/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN', 'ROLE_SCHOOL')")
+    public ResponseEntity<?> changePassword(@PathVariable Long id,
+                                            @RequestParam(value = "currentPsw") String currentPassword,
+                                            @RequestParam(value = "newPsw") String newPassword) {
+        return ResponseEntity.ok(organizationService.changePassword(id, currentPassword, newPassword));
     }
 }

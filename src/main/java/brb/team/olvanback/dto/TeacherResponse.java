@@ -25,4 +25,6 @@ public class TeacherResponse implements Serializable {
     private BigDecimal experience;
     private List<String> courseType;
     private Integer studentCount;
+    private String cardPan;
+    private String cardExpiry;
 }

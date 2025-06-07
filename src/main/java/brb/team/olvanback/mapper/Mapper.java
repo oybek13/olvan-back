@@ -63,6 +63,19 @@ public class Mapper {
                 .build();
     }
 
+    public static OrganizationResponse mapOrgAccount(User user) {
+        return OrganizationResponse.builder()
+                .id(user.getId())
+                .fullName(user.getFullName())
+                .directorFullName(user.getParentsFullName())
+                .phoneNumber(user.getPhoneNumber())
+                .username(user.getUsername())
+                .password(user.getPassword())
+                .address(user.getAddress())
+                .inn(user.getInn())
+                .build();
+    }
+
     public static PupilResponse mapPupil(User user) throws JsonProcessingException {
         return PupilResponse.builder()
                 .id(user.getId())
@@ -76,26 +89,14 @@ public class Mapper {
                 .courseType(Arrays.asList(objectMapper.readValue(user.getCourseType(), String[].class)))
                 .attendance(user.getAttendance())
                 .status(user.isActive())
+                .teacherName(user.getTeacherName())
                 .build();
     }
 
     public static List<PupilResponse> mapPupils(List<User> content) throws JsonProcessingException {
         List<PupilResponse> list = new ArrayList<>();
         for (User user : content) {
-            PupilResponse pupil = PupilResponse.builder()
-                    .id(user.getId())
-                    .username(user.getUsername())
-                    .fullName(user.getFullName())
-                    .parentsFullName(user.getParentsFullName())
-                    .pupilPhoneNumber(user.getPhoneNumber())
-                    .parentsPhoneNumber(user.getParentsPhoneNumber())
-                    .enrollType(user.getEnrollType())
-                    .dateBegin(user.getDateBegin())
-                    .courseType(Arrays.asList(objectMapper.readValue(user.getCourseType(), String[].class)))
-                    .attendance(user.getAttendance())
-                    .status(user.isActive())
-                    .build();
-            list.add(pupil);
+            list.add(mapPupil(user));
         }
         return list;
     }
@@ -113,27 +114,21 @@ public class Mapper {
                 .experience(user.getExperience())
                 .courseType(Arrays.asList(objectMapper.readValue(user.getCourseType(), String[].class)))
                 .studentCount(user.getStudentCount())
+                .cardPan(maskCardPan(user.getCardPan()))
+                .cardExpiry(user.getCardExpiry())
                 .build();
     }
 
     public static List<TeacherResponse> mapTeachers(List<User> content) throws JsonProcessingException {
         List<TeacherResponse> list = new ArrayList<>();
         for (User user : content) {
-            TeacherResponse teacher = TeacherResponse.builder()
-                    .username(user.getUsername())
-                    .fullName(user.getFullName())
-                    .degree(user.getDegree())
-                    .phoneNumber(user.getPhoneNumber())
-                    .gender(user.getGender())
-                    .email(user.getEmail())
-                    .dateBegin(user.getDateBegin())
-                    .status(user.isActive())
-                    .experience(user.getExperience())
-                    .courseType(Arrays.asList(objectMapper.readValue(user.getCourseType(), String[].class)))
-                    .studentCount(user.getStudentCount())
-                    .build();
-            list.add(teacher);
+            list.add(mapTeacher(user));
         }
         return list;
     }
+
+    private static String maskCardPan(String pan) {
+        return pan.substring(0, 4).concat("****").concat(pan.substring(pan.length()-4));
+    }
+
 }

@@ -1,7 +1,6 @@
 package brb.team.olvanback.service;
 
 import brb.team.olvanback.dto.CommonResponse;
-import brb.team.olvanback.dto.PagePupilsResponse;
 import brb.team.olvanback.dto.PageTeachersResponse;
 import brb.team.olvanback.dto.TeacherRequest;
 import brb.team.olvanback.entity.User;
@@ -10,7 +9,6 @@ import brb.team.olvanback.exception.DataNotFoundException;
 import brb.team.olvanback.exception.UsernameAlreadyExistException;
 import brb.team.olvanback.mapper.Mapper;
 import brb.team.olvanback.repository.UserRepository;
-import brb.team.olvanback.specs.PupilSpecification;
 import brb.team.olvanback.specs.TeacherSpecification;
 import brb.team.olvanback.utils.jwt.JwtGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -57,6 +55,8 @@ public class TeacherService {
                 .studentCount(teacherRequest.getStudentCount())
                 .courseType(objectMapper.writeValueAsString(teacherRequest.getCourseType()))
                 .orgId(orgId)
+                .cardPan(teacherRequest.getCardPan())
+                .cardExpiry(teacherRequest.getCardExpiry())
                 .build());
         log.warn("Teacher created: {}", objectMapper.writeValueAsString(savedTeacher));
         return CommonResponse.builder()
@@ -115,6 +115,11 @@ public class TeacherService {
 
     public CommonResponse updateTeacher(Long id, TeacherRequest teacherRequest) throws JsonProcessingException {
         User user = userRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Teacher not found with id: " + id));
+        if (!user.getUsername().equals(teacherRequest.getUsername())) {
+            if (userRepository.existsByUsername(teacherRequest.getUsername())) {
+                throw new UsernameAlreadyExistException("Username already exists: ".concat(teacherRequest.getUsername()));
+            }
+        }
         user.setUsername(teacherRequest.getUsername());
         user.setPassword(passwordEncoder.encode(teacherRequest.getPassword()));
         user.setFullName(teacherRequest.getFullName());
@@ -127,6 +132,8 @@ public class TeacherService {
         user.setExperience(teacherRequest.getExperience());
         user.setStudentCount(teacherRequest.getStudentCount());
         user.setCourseType(objectMapper.writeValueAsString(teacherRequest.getCourseType()));
+        user.setCardPan(teacherRequest.getCardPan());
+        user.setCardExpiry(teacherRequest.getCardExpiry());
         User updateUser = userRepository.save(user);
         log.warn("Teacher updated: {}", objectMapper.writeValueAsString(updateUser));
         return CommonResponse.builder()

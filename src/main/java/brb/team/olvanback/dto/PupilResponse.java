@@ -24,4 +24,5 @@ public class PupilResponse {
     private List<String> courseType;
     private int attendance;
     private Boolean status;
+    private String teacherName;
 }

@@ -37,9 +37,8 @@ public class PupilService {
 
     public CommonResponse createPupil(PupilRequest pupilRequest) throws JsonProcessingException {
         Long orgId = jwtGenerator.extractOrgId(request.getHeader("Authorization").substring(7));
-        if (userRepository.existsByUsername(pupilRequest.getUsername())) {
+        if (userRepository.existsByUsername(pupilRequest.getUsername()))
             throw new UsernameNotFoundException("Username " + pupilRequest.getUsername() + " already exists");
-        }
         User pupil = userRepository.save(User.builder()
                 .username(pupilRequest.getUsername())
                 .password(passwordEncoder.encode(pupilRequest.getPassword()))
@@ -54,6 +53,7 @@ public class PupilService {
                 .attendance(pupilRequest.getAttendance())
                 .courseType(objectMapper.writeValueAsString(pupilRequest.getCourseType()))
                 .orgId(orgId)
+                .teacherName(pupilRequest.getTeacherName())
                 .build());
         log.warn("Pupil created: {}", objectMapper.writeValueAsString(pupil));
         return CommonResponse.builder()
@@ -100,6 +100,11 @@ public class PupilService {
 
     public CommonResponse updatePupil(PupilRequest pupilRequest, Long id) throws JsonProcessingException {
         User user = userRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Pupil not found with id: " + id));
+        if (!user.getUsername().equals(pupilRequest.getUsername())) {
+            if (userRepository.existsByUsername(pupilRequest.getUsername())) {
+                throw new UsernameNotFoundException("Username " + pupilRequest.getUsername() + " already exists");
+            }
+        }
         user.setUsername(pupilRequest.getUsername());
         user.setPassword(passwordEncoder.encode(pupilRequest.getPassword()));
         user.setFullName(pupilRequest.getFullName());
@@ -111,6 +116,7 @@ public class PupilService {
         user.setActive(pupilRequest.getStatus());
         user.setAttendance(pupilRequest.getAttendance());
         user.setCourseType(objectMapper.writeValueAsString(pupilRequest.getCourseType()));
+        user.setTeacherName(pupilRequest.getTeacherName());
         User updatedPupil = userRepository.save(user);
         log.warn("Pupil updated: {}", objectMapper.writeValueAsString(updatedPupil));
         return CommonResponse.builder()
