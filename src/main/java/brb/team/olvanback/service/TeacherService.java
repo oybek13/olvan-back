@@ -9,6 +9,7 @@ import brb.team.olvanback.exception.DataNotFoundException;
 import brb.team.olvanback.exception.UsernameAlreadyExistException;
 import brb.team.olvanback.mapper.Mapper;
 import brb.team.olvanback.repository.UserRepository;
+import brb.team.olvanback.service.extra.AppService;
 import brb.team.olvanback.specs.TeacherSpecification;
 import brb.team.olvanback.utils.jwt.JwtGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -34,9 +35,9 @@ public class TeacherService {
     private final HttpServletRequest request;
     private final JwtGenerator jwtGenerator;
     private final PasswordEncoder passwordEncoder;
+    private final AppService appService;
 
     public CommonResponse createTeacher(TeacherRequest teacherRequest) throws JsonProcessingException {
-        Long orgId = jwtGenerator.extractOrgId(request.getHeader("Authorization").substring(7));
         if (userRepository.existsByUsername(teacherRequest.getUsername())) {
             throw new UsernameAlreadyExistException("Username " + teacherRequest.getUsername() + " already exist");
         }
@@ -54,7 +55,7 @@ public class TeacherService {
                 .experience(teacherRequest.getExperience())
                 .studentCount(teacherRequest.getStudentCount())
                 .courseType(objectMapper.writeValueAsString(teacherRequest.getCourseType()))
-                .orgId(orgId)
+                .orgId(appService.getOrgId())
                 .cardPan(teacherRequest.getCardPan())
                 .cardExpiry(teacherRequest.getCardExpiry())
                 .build());
@@ -81,10 +82,9 @@ public class TeacherService {
                                          Boolean status,
                                          String dateBegin,
                                          Integer studentCount) throws JsonProcessingException {
-        Long orgId = jwtGenerator.extractOrgId(request.getHeader("Authorization").substring(7));
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
         Specification<User> spec = Specification.where(TeacherSpecification.hasRole(UserRole.ROLE_TEACHER))
-                .and(TeacherSpecification.hasOrgId(orgId))
+                .and(TeacherSpecification.hasOrgId(appService.getOrgId()))
                 .and(TeacherSpecification.hasFullName(fullName))
                 .and(TeacherSpecification.hasPhoneNumber(phoneNumber))
                 .and(TeacherSpecification.hasDateBegin(dateBegin))

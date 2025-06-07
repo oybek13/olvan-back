@@ -19,19 +19,19 @@ public class PupilController {
     private final PupilService pupilService;
 
     @PostMapping("/create")
-    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN', 'ROLE_SCHOOL')")
+    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN', 'ROLE_SCHOOL', 'ROLE_TEACHER')")
     public ResponseEntity<?> create(@RequestBody PupilRequest pupilRequest) throws JsonProcessingException {
         return ResponseEntity.ok(pupilService.createPupil(pupilRequest));
     }
 
     @GetMapping("/{pupilId}")
-    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN', 'ROLE_SCHOOL')")
+    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN', 'ROLE_SCHOOL', 'ROLE_TEACHER')")
     public ResponseEntity<?> getOne(@PathVariable("pupilId") Long pupilId) throws JsonProcessingException {
         return ResponseEntity.ok(pupilService.getOnePupil(pupilId));
     }
 
     @GetMapping("/all")
-    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN', 'ROLE_SCHOOL')")
+    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN', 'ROLE_SCHOOL', 'ROLE_TEACHER')")
     public ResponseEntity<?> getAll(@RequestParam(value = "page") int page,
                                     @RequestParam(value = "size") int size,
                                     @RequestParam(value = "id", required = false) Long id,
@@ -42,14 +42,14 @@ public class PupilController {
     }
 
     @PutMapping("/{pupilId}")
-    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN', 'ROLE_SCHOOL')")
+    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN', 'ROLE_SCHOOL', 'ROLE_TEACHER')")
     public ResponseEntity<?> update(@PathVariable(value = "pupilId") Long pupilId,
                                     @RequestBody PupilRequest pupilRequest) throws JsonProcessingException {
         return ResponseEntity.ok(pupilService.updatePupil(pupilRequest, pupilId));
     }
 
     @DeleteMapping("/{pupilId}")
-    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN', 'ROLE_SCHOOL')")
+    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN', 'ROLE_SCHOOL', 'ROLE_TEACHER')")
     public ResponseEntity<?> delete(@PathVariable(value = "pupilId") Long pupilId) throws JsonProcessingException {
         return ResponseEntity.ok(pupilService.deletePupil(pupilId));
     }

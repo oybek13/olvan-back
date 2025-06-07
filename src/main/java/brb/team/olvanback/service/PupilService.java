@@ -8,6 +8,7 @@ import brb.team.olvanback.enums.UserRole;
 import brb.team.olvanback.exception.DataNotFoundException;
 import brb.team.olvanback.mapper.Mapper;
 import brb.team.olvanback.repository.UserRepository;
+import brb.team.olvanback.service.extra.AppService;
 import brb.team.olvanback.specs.PupilSpecification;
 import brb.team.olvanback.utils.jwt.JwtGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -34,9 +35,9 @@ public class PupilService {
     private final ObjectMapper objectMapper;
     private final HttpServletRequest request;
     private final PasswordEncoder passwordEncoder;
+    private final AppService appService;
 
     public CommonResponse createPupil(PupilRequest pupilRequest) throws JsonProcessingException {
-        Long orgId = jwtGenerator.extractOrgId(request.getHeader("Authorization").substring(7));
         if (userRepository.existsByUsername(pupilRequest.getUsername()))
             throw new UsernameNotFoundException("Username " + pupilRequest.getUsername() + " already exists");
         User pupil = userRepository.save(User.builder()
@@ -52,7 +53,7 @@ public class PupilService {
                 .isActive(pupilRequest.getStatus())
                 .attendance(pupilRequest.getAttendance())
                 .courseType(objectMapper.writeValueAsString(pupilRequest.getCourseType()))
-                .orgId(orgId)
+                .orgId(appService.getOrgId())
                 .teacherName(pupilRequest.getTeacherName())
                 .build());
         log.warn("Pupil created: {}", objectMapper.writeValueAsString(pupil));
@@ -77,10 +78,9 @@ public class PupilService {
                                        String enrollType,
                                        Boolean status,
                                        String dateBegin) throws JsonProcessingException {
-        Long orgId = jwtGenerator.extractOrgId(request.getHeader("Authorization").substring(7));
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
         Specification<User> spec = Specification.where(PupilSpecification.hasRole(UserRole.ROLE_PUPIL))
-                .and(PupilSpecification.hasOrgId(orgId))
+                .and(PupilSpecification.hasOrgId(appService.getOrgId()))
                 .and(PupilSpecification.hasId(id))
                 .and(PupilSpecification.hasEnrollType(enrollType))
                 .and(PupilSpecification.hasDateBegin(dateBegin))
