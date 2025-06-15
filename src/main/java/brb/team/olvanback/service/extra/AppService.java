@@ -15,4 +15,12 @@ public class AppService {
     public Long getOrgId() {
         return jwtGenerator.extractOrgId(request.getHeader("Authorization").substring(7));
     }
+
+    public String getRole() {
+        return jwtGenerator.extractRole(request.getHeader("Authorization").substring(7)).getFirst();
+    }
+
+    public String getUsername() {
+        return jwtGenerator.extractUserName(request.getHeader("Authorization").substring(7));
+    }
 }

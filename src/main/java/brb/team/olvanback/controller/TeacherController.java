@@ -1,5 +1,6 @@
 package brb.team.olvanback.controller;
 
+import brb.team.olvanback.dto.TeacherAccountRequest;
 import brb.team.olvanback.dto.TeacherRequest;
 import brb.team.olvanback.service.TeacherService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -54,5 +55,15 @@ public class TeacherController {
         return ResponseEntity.ok(teacherService.updateTeacher(teacherId, teacherRequest));
     }
 
+    @GetMapping("/account")
+    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN', 'ROLE_TEACHER')")
+    public ResponseEntity<?> getAccount() {
+        return ResponseEntity.ok(teacherService.getTeacherAccount());
+    }
 
+    @PutMapping("/updateAccount")
+    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN', 'ROLE_TEACHER')")
+    public ResponseEntity<?> updateAccount(@RequestBody TeacherAccountRequest request) throws JsonProcessingException {
+        return ResponseEntity.ok(teacherService.updateTeacherAccount(request));
+    }
 }

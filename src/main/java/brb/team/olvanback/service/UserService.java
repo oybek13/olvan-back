@@ -4,6 +4,7 @@ import brb.team.olvanback.dto.CommonResponse;
 import brb.team.olvanback.dto.SignInRequest;
 import brb.team.olvanback.dto.SignUpRequest;
 import brb.team.olvanback.entity.User;
+import brb.team.olvanback.enums.UserRole;
 import brb.team.olvanback.exception.DataNotFoundException;
 import brb.team.olvanback.repository.UserRepository;
 import brb.team.olvanback.utils.jwt.JwtGenerator;
@@ -55,10 +56,17 @@ public class UserService {
         roles.add(user.getRole().toString());
         Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(sign.getUsername(), sign.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authenticate);
+        if (user.getRole() == UserRole.ROLE_SCHOOL || user.getRole() == UserRole.ROLE_SUPER_ADMIN) {
+            return CommonResponse.builder()
+                    .success(true)
+                    .message("Sign in successful")
+                    .data(jwtGenerator.generateToken(sign.getUsername(), roles, user.getId()))
+                    .build();
+        }
         return CommonResponse.builder()
                 .success(true)
                 .message("Sign in successful")
-                .data(jwtGenerator.generateToken(sign.getUsername(), roles, user.getId()))
+                .data(jwtGenerator.generateToken(sign.getUsername(), roles, user.getOrgId()))
                 .build();
     }
 

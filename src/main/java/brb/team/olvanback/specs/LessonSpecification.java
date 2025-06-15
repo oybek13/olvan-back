@@ -2,8 +2,11 @@ package brb.team.olvanback.specs;
 
 import brb.team.olvanback.entity.Lesson;
 import brb.team.olvanback.entity.User;
+import brb.team.olvanback.enums.Days;
 import brb.team.olvanback.enums.UserRole;
 import org.springframework.data.jpa.domain.Specification;
+
+import java.time.LocalDate;
 
 public class LessonSpecification {
     public static Specification<Lesson> hasName(String name) {
@@ -59,4 +62,15 @@ public class LessonSpecification {
             return cb.like(cb.lower(root.get("teacherFullName")), "%" + name.toLowerCase() + "%");
         };
     }
+
+    public static Specification<Lesson> hasBeginDate(LocalDate date) {
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.greaterThanOrEqualTo(root.get("dateBegin"), date);
+    }
+
+    public static Specification<Lesson> hasDay(Days day) {
+        return (root, query, cb) -> cb.like(root.get("days"), "%\"" + day.name() + "\"%");
+    }
+
+
 }

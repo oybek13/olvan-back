@@ -119,6 +119,16 @@ public class Mapper {
                 .build();
     }
 
+    public static TeacherResponse mapTeacherAccount(User user) {
+        return TeacherResponse.builder()
+                .fullName(user.getFullName())
+                .email(user.getEmail())
+                .phoneNumber(user.getPhoneNumber())
+                .cardPan(maskCardPan(user.getCardPan()))
+                .build();
+    }
+
+
     public static List<TeacherResponse> mapTeachers(List<User> content) throws JsonProcessingException {
         List<TeacherResponse> list = new ArrayList<>();
         for (User user : content) {

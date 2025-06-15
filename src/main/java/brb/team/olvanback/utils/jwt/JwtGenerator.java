@@ -1,9 +1,11 @@
 package brb.team.olvanback.utils.jwt;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,7 @@ import javax.crypto.SecretKey;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class JwtGenerator {
@@ -60,6 +63,17 @@ public class JwtGenerator {
     public Long extractOrgId(String token) {
         Object orgIdObj = extractAllClaims(token).get("orgId");
         return orgIdObj != null ? Long.valueOf(orgIdObj.toString()) : null;
+    }
+
+    public List<String> extractRole(String token) {
+        Object roles = extractAllClaims(token).get("roles");
+        if (roles instanceof List<?>) {
+            return ((List<?>) roles).stream()
+                    .filter(Objects::nonNull)
+                    .map(Object::toString)
+                    .collect(Collectors.toList());
+        }
+        return Collections.emptyList();
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimResolver) {

@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -19,7 +20,7 @@ public class LessonRequest {
     private Long price;
     private String teacherFullName;
     private Boolean status;
-    private String dateBegin;
+    private LocalDate dateBegin;
     private List<String> days;
     private String timeBegin;
     private String timeEnd;

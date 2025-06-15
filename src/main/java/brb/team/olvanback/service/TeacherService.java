@@ -2,6 +2,7 @@ package brb.team.olvanback.service;
 
 import brb.team.olvanback.dto.CommonResponse;
 import brb.team.olvanback.dto.PageTeachersResponse;
+import brb.team.olvanback.dto.TeacherAccountRequest;
 import brb.team.olvanback.dto.TeacherRequest;
 import brb.team.olvanback.entity.User;
 import brb.team.olvanback.enums.UserRole;
@@ -139,6 +140,30 @@ public class TeacherService {
         return CommonResponse.builder()
                 .success(true)
                 .message("Teacher updated successfully!")
+                .build();
+    }
+
+    public CommonResponse getTeacherAccount() {
+        User user = userRepository.findByUsername(appService.getUsername()).orElseThrow(() -> new DataNotFoundException("User not found!"));
+        return CommonResponse.builder()
+                .success(true)
+                .message("Success!")
+                .data(Mapper.mapTeacherAccount(user))
+                .build();
+
+    }
+
+    public CommonResponse updateTeacherAccount(TeacherAccountRequest teacherAccountRequest) throws JsonProcessingException {
+        User user = userRepository.findByUsername(appService.getUsername()).orElseThrow(() -> new DataNotFoundException("User not found!"));
+        user.setFullName(teacherAccountRequest.getFullName());
+        user.setEmail(teacherAccountRequest.getEmail());
+        user.setPhoneNumber(teacherAccountRequest.getPhoneNumber());
+        user.setAddress(teacherAccountRequest.getAddress());
+        User updatedAccount = userRepository.save(user);
+        log.warn("Teacher himself/herself updated account: {}", objectMapper.writeValueAsString(updatedAccount));
+        return CommonResponse.builder()
+                .success(true)
+                .message("Updated!")
                 .build();
     }
 

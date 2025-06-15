@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity(name = "olvan_lessons")
@@ -51,7 +52,7 @@ public class Lesson {
     private Boolean status;
 
     @Column(name = "date_begin", nullable = false)
-    private String dateBegin;
+    private LocalDate dateBegin;
 
     @Column(name = "days", nullable = false)
     private String days;

@@ -6,7 +6,6 @@ import brb.team.olvanback.service.LessonService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.simpleframework.xml.Path;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/lesson")
 @CrossOrigin
-@Tag(name = "Lesson")
+@Tag(name = "Lessons")
 public class LessonController {
 
     private final LessonService lessonService;

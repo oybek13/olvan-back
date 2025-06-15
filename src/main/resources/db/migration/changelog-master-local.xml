@@ -12,6 +12,7 @@
     <include file="db/migration/sql/tables/v5_001_users.sql" context="olvan"/>
     <include file="db/migration/sql/tables/v6_001_users.sql" context="olvan"/>
     <include file="db/migration/sql/tables/v1_003_lessons.sql" context="olvan"/>
+    <include file="db/migration/sql/tables/v2_003_lessons.sql" context="olvan"/>
 
 <!--    <changeSet id="ln_class_credit_values" author="claim-service">-->
 <!--        <sqlFile path="db/migration/sql/values/v1_02_ln_class_credit_values.sql"/>-->
