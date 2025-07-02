@@ -1,4 +1,4 @@
-package brb.team.olvanback.exception.advice;
+package brb.team.olvanback.exception;
 
 import brb.team.olvanback.dto.CommonResponse;
 import brb.team.olvanback.exception.DataNotFoundException;
