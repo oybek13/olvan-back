@@ -34,6 +34,7 @@ public class ExceptionHandlerAdvice {
         if (e instanceof AuthenticationException || e instanceof AccessDeniedException) {
             throw (RuntimeException) e;
         }
+
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new CommonResponse<>(false, "Internal Server Error", null));
     }
 
