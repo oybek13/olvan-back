@@ -10,7 +10,6 @@
     <include file="/db/migration/sql/tables/v4_001_users.sql" context="olvan"/>
     <include file="/db/migration/sql/tables/v1_002_contracts.sql" context="olvan"/>
     <include file="db/migration/sql/tables/v5_001_users.sql" context="olvan"/>
-    <include file="db/migration/sql/tables/v6_001_users.sql" context="olvan"/>
     <include file="db/migration/sql/tables/v1_003_lessons.sql" context="olvan"/>
     <include file="db/migration/sql/tables/v2_003_lessons.sql" context="olvan"/>
 

@@ -91,10 +91,4 @@ public class User {
 
     @Column(name = "teacher_name", length = 500)
     private String teacherName;
-
-    @Column(name = "card_pan", length = 16)
-    private String cardPan;
-
-    @Column(name = "card_expiry", length = 4)
-    private String cardExpiry;
 }

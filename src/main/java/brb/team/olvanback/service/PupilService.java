@@ -25,6 +25,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -75,15 +77,15 @@ public class PupilService {
     public CommonResponse getAllPupils(int page,
                                        int size,
                                        Long id,
-                                       String enrollType,
                                        Boolean status,
-                                       String dateBegin) throws JsonProcessingException {
+                                       String fullName,
+                                       List<String> courseTypes) throws JsonProcessingException {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
         Specification<User> spec = Specification.where(PupilSpecification.hasRole(UserRole.ROLE_PUPIL))
                 .and(PupilSpecification.hasOrgId(appService.getOrgId()))
                 .and(PupilSpecification.hasId(id))
-                .and(PupilSpecification.hasEnrollType(enrollType))
-                .and(PupilSpecification.hasDateBegin(dateBegin))
+                .and(PupilSpecification.hasFullName(fullName))
+                .and(PupilSpecification.hasCourseTypes(courseTypes))
                 .and(PupilSpecification.isActive(status));
         Page<User> userPage = userRepository.findAll(spec, pageable);
         return CommonResponse.builder()

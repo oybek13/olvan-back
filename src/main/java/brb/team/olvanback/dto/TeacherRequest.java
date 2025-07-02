@@ -25,6 +25,4 @@ public class TeacherRequest {
     private BigDecimal experience;
     private Integer studentCount;
     private List<String> courseType;
-    private String cardPan;
-    private String cardExpiry;
 }

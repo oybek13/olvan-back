@@ -33,8 +33,6 @@ public class TeacherService {
 
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
-    private final HttpServletRequest request;
-    private final JwtGenerator jwtGenerator;
     private final PasswordEncoder passwordEncoder;
     private final AppService appService;
 
@@ -57,8 +55,6 @@ public class TeacherService {
                 .studentCount(teacherRequest.getStudentCount())
                 .courseType(objectMapper.writeValueAsString(teacherRequest.getCourseType()))
                 .orgId(appService.getOrgId())
-                .cardPan(teacherRequest.getCardPan())
-                .cardExpiry(teacherRequest.getCardExpiry())
                 .build());
         log.warn("Teacher created: {}", objectMapper.writeValueAsString(savedTeacher));
         return CommonResponse.builder()
@@ -133,8 +129,6 @@ public class TeacherService {
         user.setExperience(teacherRequest.getExperience());
         user.setStudentCount(teacherRequest.getStudentCount());
         user.setCourseType(objectMapper.writeValueAsString(teacherRequest.getCourseType()));
-        user.setCardPan(teacherRequest.getCardPan());
-        user.setCardExpiry(teacherRequest.getCardExpiry());
         User updateUser = userRepository.save(user);
         log.warn("Teacher updated: {}", objectMapper.writeValueAsString(updateUser));
         return CommonResponse.builder()

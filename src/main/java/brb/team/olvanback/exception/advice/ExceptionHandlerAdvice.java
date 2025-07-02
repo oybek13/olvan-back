@@ -1,6 +1,7 @@
-package brb.team.olvanback.exception;
+package brb.team.olvanback.exception.advice;
 
 import brb.team.olvanback.dto.CommonResponse;
+import brb.team.olvanback.exception.DataNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -33,7 +34,7 @@ public class ExceptionHandlerAdvice {
         if (e instanceof AuthenticationException || e instanceof AccessDeniedException) {
             throw (RuntimeException) e;
         }
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new CommonResponse<>(false, "Error: " + e.getMessage(), null));
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new CommonResponse<>(false, "Internal Server Error", null));
     }
 
 }

@@ -103,6 +103,7 @@ public class Mapper {
 
     public static TeacherResponse mapTeacher(User user) throws JsonProcessingException {
         return TeacherResponse.builder()
+                .id(user.getId())
                 .username(user.getUsername())
                 .fullName(user.getFullName())
                 .degree(user.getDegree())
@@ -114,8 +115,6 @@ public class Mapper {
                 .experience(user.getExperience())
                 .courseType(Arrays.asList(objectMapper.readValue(user.getCourseType(), String[].class)))
                 .studentCount(user.getStudentCount())
-                .cardPan(maskCardPan(user.getCardPan()))
-                .cardExpiry(user.getCardExpiry())
                 .build();
     }
 
@@ -124,7 +123,6 @@ public class Mapper {
                 .fullName(user.getFullName())
                 .email(user.getEmail())
                 .phoneNumber(user.getPhoneNumber())
-                .cardPan(maskCardPan(user.getCardPan()))
                 .build();
     }
 
@@ -135,10 +133,6 @@ public class Mapper {
             list.add(mapTeacher(user));
         }
         return list;
-    }
-
-    private static String maskCardPan(String pan) {
-        return pan.substring(0, 4).concat("****").concat(pan.substring(pan.length()-4));
     }
 
 }

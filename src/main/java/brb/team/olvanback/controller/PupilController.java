@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/pupil")
 @Tag(name = "Pupils")
@@ -35,10 +37,10 @@ public class PupilController {
     public ResponseEntity<?> getAll(@RequestParam(value = "page") int page,
                                     @RequestParam(value = "size") int size,
                                     @RequestParam(value = "id", required = false) Long id,
-                                    @RequestParam(value = "enrollType", required = false) String enrollType,
+                                    @RequestParam(value = "fullName", required = false) String fullName,
                                     @RequestParam(value = "status", required = false) Boolean status,
-                                    @RequestParam(value = "dateBegin", required = false) String dateBegin) throws JsonProcessingException {
-        return ResponseEntity.ok(pupilService.getAllPupils(page, size, id, enrollType, status, dateBegin));
+                                    @RequestParam(value = "courseType", required = false) List<String> courseType) throws JsonProcessingException {
+        return ResponseEntity.ok(pupilService.getAllPupils(page, size, id, status, fullName, courseType));
     }
 
     @PutMapping("/{pupilId}")

@@ -16,6 +16,7 @@ import java.util.List;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TeacherResponse implements Serializable {
+    private Long id;
     private String username;
     private String fullName;
     private String degree;

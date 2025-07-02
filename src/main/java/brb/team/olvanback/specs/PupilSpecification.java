@@ -2,7 +2,11 @@ package brb.team.olvanback.specs;
 
 import brb.team.olvanback.entity.User;
 import brb.team.olvanback.enums.UserRole;
+import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PupilSpecification {
 
@@ -59,4 +63,29 @@ public class PupilSpecification {
             return cb.like(cb.lower(root.get("enrollType")), "%" + enrollType.toLowerCase() + "%");
         };
     }
+
+    public static Specification<User> hasFullName(String fullName) {
+        return (root, query, cb) -> {
+            if (fullName == null || fullName.isEmpty()) {
+                return cb.conjunction();
+            }
+            return cb.like(cb.lower(root.get("fullName")), "%" + fullName.toLowerCase() + "%");
+        };
+    }
+
+    public static Specification<User> hasCourseTypes(List<String> courseTypes) {
+        return (root, query, cb) -> {
+            if (courseTypes == null || courseTypes.isEmpty()) {
+                return cb.conjunction();
+            }
+
+            List<Predicate> predicates = new ArrayList<>();
+            for (String type : courseTypes) {
+                predicates.add(cb.like(cb.lower(root.get("courseType")), "%" + type.toLowerCase() + "%"));
+            }
+
+            return cb.or(predicates.toArray(new Predicate[0])); // <--- AND emas, OR bo‘ldi!
+        };
+    }
+
 }
