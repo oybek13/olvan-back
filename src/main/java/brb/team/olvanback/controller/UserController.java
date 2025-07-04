@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/api/auth")
+@RequestMapping("/api/auth")
 @Tag(name = "Authentication")
 @CrossOrigin
 public class UserController {
