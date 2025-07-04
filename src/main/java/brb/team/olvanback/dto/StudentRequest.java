@@ -6,13 +6,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PupilRequest {
+public class StudentRequest {
     private String username;
     private String password;
     private String fullName;
@@ -20,9 +21,9 @@ public class PupilRequest {
     private String pupilPhoneNumber;
     private String parentsPhoneNumber;
     private EnrollType enrollType;
-    private String dateBegin;
+    private LocalDate dateBegin;
     private Boolean status;
     private Integer attendance;
     private List<String> courseType;
-    private String teacherName;
+    private List<String> teacherName;
 }

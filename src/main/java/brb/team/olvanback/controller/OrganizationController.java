@@ -28,18 +28,18 @@ public class OrganizationController {
         return ResponseEntity.ok(organizationService.createOrganization(organizationRequest, contract));
     }
 
-    @GetMapping("/{orgId}")
+    @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
-    public ResponseEntity<CommonResponse> getOne(@PathVariable(value = "orgId") Long orgId) throws JsonProcessingException {
-        return ResponseEntity.ok(organizationService.getOneOrganization(orgId));
+    public ResponseEntity<CommonResponse> getOne(@PathVariable(value = "id") Long id) throws JsonProcessingException {
+        return ResponseEntity.ok(organizationService.getOneOrganization(id));
     }
 
-    @PutMapping(value = "/{orgId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
-    public ResponseEntity<CommonResponse> update(@PathVariable(value = "orgId") Long orgId,
+    public ResponseEntity<CommonResponse> update(@PathVariable(value = "id") Long id,
                                                  @RequestParam(value = "data") String data,
                                                  @RequestParam(value = "contract", required = false) MultipartFile contract) throws Exception {
-        return ResponseEntity.ok(organizationService.editOrganization(data, contract, orgId));
+        return ResponseEntity.ok(organizationService.editOrganization(data, contract, id));
     }
 
     @DeleteMapping("/{orgId}")
@@ -53,7 +53,7 @@ public class OrganizationController {
     public ResponseEntity<?> getAll(@RequestParam(value = "address", required = false) String address,
                                     @RequestParam(value = "fullName", required = false) String fullName,
                                     @RequestParam(value = "inn", required = false) String inn,
-                                    @RequestParam(value = "active") boolean active,
+                                    @RequestParam(value = "active", required = false) Boolean active,
                                     @RequestParam(value = "page") int page,
                                     @RequestParam(value = "size") int size) {
         return ResponseEntity.ok(organizationService.getAll(address, fullName, inn, active, page, size));

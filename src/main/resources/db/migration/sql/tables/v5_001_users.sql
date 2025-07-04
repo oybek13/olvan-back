@@ -1,1 +1,0 @@
-ALTER TABLE olvan_users ADD COLUMN teacher_name varchar(500);

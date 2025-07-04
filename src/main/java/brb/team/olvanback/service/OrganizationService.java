@@ -5,6 +5,7 @@ import brb.team.olvanback.dto.OrganizationAccountRequest;
 import brb.team.olvanback.dto.OrganizationRequest;
 import brb.team.olvanback.dto.PageOrgResponse;
 import brb.team.olvanback.entity.Contract;
+import brb.team.olvanback.entity.Organization;
 import brb.team.olvanback.entity.User;
 import brb.team.olvanback.enums.UserRole;
 import brb.team.olvanback.exception.DataNotFoundException;
@@ -12,9 +13,10 @@ import brb.team.olvanback.exception.UserPasswordNotMatchException;
 import brb.team.olvanback.exception.UsernameAlreadyExistException;
 import brb.team.olvanback.mapper.Mapper;
 import brb.team.olvanback.repository.ContractRepository;
+import brb.team.olvanback.repository.OrganizationRepository;
 import brb.team.olvanback.repository.UserRepository;
 import brb.team.olvanback.service.extra.MinioService;
-import brb.team.olvanback.specs.OrgSpecification;
+import brb.team.olvanback.specs.OrganizationSpecification;
 import brb.team.olvanback.utils.jwt.JwtGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,7 +29,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -45,6 +46,7 @@ public class OrganizationService {
     private final Mapper mapper;
     private final JwtGenerator jwtGenerator;
     private final HttpServletRequest request;
+    private final OrganizationRepository organizationRepository;
     @Value("${minio.url}")
     private String url;
     @Value("${minio.bucket}")
@@ -54,34 +56,39 @@ public class OrganizationService {
         OrganizationRequest request = objectMapper.readValue(organization, OrganizationRequest.class);
         if (userRepository.existsByUsername(request.getUsername()))
             throw new UsernameAlreadyExistException("Username already exist: " + request.getUsername());
-        log.info("Request to create organization: {}", objectMapper.writeValueAsString(request));
+        log.info("Request to create user: {}", objectMapper.writeValueAsString(request));
         User savedUser = userRepository.save(User.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .fullName(request.getFullName())
-                .phoneNumber(request.getPhoneNumber())
-                .parentsPhoneNumber(request.getDirectorPhoneNumber())
-                .parentsFullName(request.getDirectorFullName())
-                .dateBegin(request.getDateBegin())
-                .address(request.getAddress())
-                .inn(request.getInn())
                 .role(UserRole.ROLE_SCHOOL)
                 .isActive(request.getIsActive())
                 .build());
-        log.info("Response after creating organization: {}", objectMapper.writeValueAsString(savedUser));
-        uploadContract(contract, savedUser);
+        log.info("Response after creating user: {}", objectMapper.writeValueAsString(savedUser));
+        log.info("Request to create organization: {}", objectMapper.writeValueAsString(request));
+        Organization savedOrg = organizationRepository.save(Organization.builder()
+                .fullName(request.getFullName())
+                .phoneNumber(request.getPhoneNumber())
+                .directorPhoneNumber(request.getDirectorPhoneNumber())
+                .directorFullName(request.getDirectorFullName())
+                .dateBegin(request.getDateBegin())
+                .address(request.getAddress())
+                .innOrPinfl(request.getInn())
+                .user(savedUser)
+                .build());
+        log.info("Response after creating organization: {}", objectMapper.writeValueAsString(savedOrg));
+        uploadContract(contract, savedOrg);
         return CommonResponse.builder()
                 .success(true)
                 .message("Organization created successfully!")
                 .build();
     }
 
-    private void uploadContract(MultipartFile file, User user) throws Exception {
+    private void uploadContract(MultipartFile file, Organization organization) throws Exception {
         // Generate the object name (e.g., the file name) that will be stored in the bucket
         String objectName = file.getOriginalFilename();
         minioService.sendingTheFileToMinio(file);
-        if (contractRepository.existsByUserId(user.getId())) {
-            Contract contract = contractRepository.findByUserId(user.getId()).orElse(null);
+        if (contractRepository.existsByOrgId(organization.getId())) {
+            Contract contract = contractRepository.findByOrgId(organization.getId()).orElse(null);
             contract.setFileName(objectName);
             contract.setFilePath(url + "/" + bucket + "/" + objectName);
             contract.setFileSize(file.getSize());
@@ -92,27 +99,29 @@ public class OrganizationService {
                     .fileName(objectName)
                     .filePath(url + "/" + bucket + "/" + objectName)
                     .fileSize(file.getSize())
-                    .user(user)
+                    .orgId(organization.getId())
                     .build());
             log.warn("Contract saved successfully: {}", objectMapper.writeValueAsString(entity));
         }
     }
 
     public CommonResponse getOneOrganization(Long id) throws JsonProcessingException {
-        User user = userRepository.findByIdAndRole(id, UserRole.ROLE_SCHOOL).orElseThrow(() -> new DataNotFoundException("Organization not found with id: " + id));
-        log.warn("Response from getOneOrganization: {}", objectMapper.writeValueAsString(user));
-        Contract contract = contractRepository.findByUserId(user.getId()).orElse(null);
+        Organization organization = organizationRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Organization not found with id: " + id));
+        User user = userRepository.findById(organization.getUser().getId()).orElse(null);
+        log.warn("Response from getOneOrganization: {}", objectMapper.writeValueAsString(organization));
+        Contract contract = contractRepository.findByOrgId(organization.getId()).orElse(null);
         return CommonResponse.builder()
                 .success(true)
                 .message("Success!")
-                .data(Mapper.mapOrg(user, contract))
+                .data(Mapper.mapOrg(user, organization, contract))
                 .build();
     }
 
     public CommonResponse editOrganization(String data, MultipartFile contract, Long id) throws Exception {
         OrganizationRequest request = objectMapper.readValue(data, OrganizationRequest.class);
         log.info("Request to edit organization: {} \t {}", objectMapper.writeValueAsString(request), id);
-        User user = userRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Organization not found with id: " + id));
+        Organization organization = organizationRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Organization not found with id: " + id));
+        User user = userRepository.findById(organization.getUser().getId()).orElseThrow(() -> new DataNotFoundException("User not found with id: " + organization.getUser().getId()));
         if (!user.getUsername().equals(request.getUsername())) {
             if (userRepository.existsByUsername(request.getUsername())) {
                 throw new UsernameAlreadyExistException("Username already exist: " + request.getUsername());
@@ -120,18 +129,20 @@ public class OrganizationService {
         }
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setFullName(request.getFullName());
-        user.setPhoneNumber(request.getPhoneNumber());
-        user.setParentsPhoneNumber(request.getDirectorPhoneNumber());
-        user.setParentsFullName(request.getDirectorFullName());
-        user.setDateBegin(request.getDateBegin());
-        user.setAddress(request.getAddress());
-        user.setInn(request.getInn());
         user.setActive(request.getIsActive());
+        organization.setFullName(request.getFullName());
+        organization.setPhoneNumber(request.getPhoneNumber());
+        organization.setDirectorPhoneNumber(request.getDirectorPhoneNumber());
+        organization.setDirectorFullName(request.getDirectorFullName());
+        organization.setDateBegin(request.getDateBegin());
+        organization.setAddress(request.getAddress());
+        organization.setInnOrPinfl(request.getInn());
         User editedUser = userRepository.save(user);
-        log.info("Response after editing organization: {}", objectMapper.writeValueAsString(editedUser));
+        log.info("Response after editing user: {}", objectMapper.writeValueAsString(editedUser));
+        Organization editedOrganization = organizationRepository.save(organization);
+        log.info("Response after editing organization: {}", objectMapper.writeValueAsString(editedOrganization));
         if (contract != null) {
-            uploadContract(contract, editedUser);
+            uploadContract(contract, editedOrganization);
         }
         return CommonResponse.builder()
                 .success(true)
@@ -141,9 +152,14 @@ public class OrganizationService {
 
     public CommonResponse deleteOrganization(Long id) {
         log.info("Request to delete organization: {}", id);
-        User user = userRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Organization not found with id: " + id));
-        userRepository.delete(user);
+        Organization organization = organizationRepository.findById(id).orElseThrow(
+                () -> new DataNotFoundException("Organization not found with id: " + id));
+        organizationRepository.delete(organization);
         log.warn("Organization deleted with id: {}", id);
+        User user = userRepository.findById(organization.getUser().getId()).orElseThrow(
+                () -> new DataNotFoundException("UserOrganization not found with id: " + organization.getUser().getId()));
+        userRepository.delete(user);
+        log.warn("UserOrganization deleted with id: {}", organization.getUser().getId());
         return CommonResponse.builder()
                 .success(true)
                 .message("Organization deleted successfully!")
@@ -156,50 +172,58 @@ public class OrganizationService {
                                  Boolean active,
                                  int page,
                                  int size) {
+
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
-        Specification<User> spec = Specification.where(OrgSpecification.hasRoleIn(UserRole.ROLE_SCHOOL.name()))
-                .and(OrgSpecification.hasAddress(address))
-                .and(OrgSpecification.hasFullName(fullName))
-                .and(OrgSpecification.hasInn(inn))
-                .and(OrgSpecification.isActive(active));
-        Page<User> userPage = userRepository.findAll(spec, pageable);
+
+        Specification<Organization> spec = Specification
+                .where(OrganizationSpecification.hasFullName(fullName))
+                .and(OrganizationSpecification.hasAddress(address))
+                .and(OrganizationSpecification.hasInn(inn))
+                .and(OrganizationSpecification.hasUserActive(active));
+
+        Page<Organization> orgPage = organizationRepository.findAll(spec, pageable);
+
         return CommonResponse.builder()
                 .success(true)
                 .message("Success!")
                 .data(PageOrgResponse.builder()
                         .page(page)
                         .size(size)
-                        .totalElements(userPage.getTotalElements())
-                        .contents(mapper.mapOrgs(userPage.getContent()))
+                        .totalElements(orgPage.getTotalElements())
+                        .contents(mapper.mapOrgs(orgPage.getContent()))
                         .build())
                 .build();
     }
 
+
     public CommonResponse getOneAccount() {
         Long orgId = jwtGenerator.extractOrgId(request.getHeader("Authorization").substring(7));
-        User user = userRepository.findById(orgId).orElseThrow(() -> new DataNotFoundException("Organization not found with id: " + orgId));
+        Organization organization = organizationRepository.findById(orgId).orElseThrow(() -> new DataNotFoundException("Organization not found with id: " + orgId));
+        User user = userRepository.findById(organization.getUser().getId()).orElseThrow(() -> new DataNotFoundException("Organization not found with id: " + orgId));
         return CommonResponse.builder()
                 .success(true)
                 .message("Success!")
-                .data(Mapper.mapOrgAccount(user))
+                .data(Mapper.mapOrgAccount(user, organization))
                 .build();
     }
 
     public CommonResponse updateAccount(Long id, OrganizationAccountRequest organizationAccountRequest) throws JsonProcessingException {
-        User user = userRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Organization not found with id: " + id));
+        Organization organization = organizationRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Organization not found with id: " + id));
+        User user = userRepository.findById(organization.getId()).orElse(null);
         if (!user.getUsername().equals(organizationAccountRequest.getUsername())) {
             if (userRepository.existsByUsername(organizationAccountRequest.getUsername())) {
                 throw new UsernameAlreadyExistException("Username already exist: " + organizationAccountRequest.getUsername());
             }
         }
-        user.setFullName(organizationAccountRequest.getFullName());
-        user.setParentsFullName(organizationAccountRequest.getDirectorFullName());
-        user.setPhoneNumber(organizationAccountRequest.getPhoneNumber());
         user.setUsername(organizationAccountRequest.getUsername());
-        user.setAddress(organizationAccountRequest.getAddress());
-        user.setInn(organizationAccountRequest.getInn());
-        User savedUser = userRepository.save(user);
-        log.info("Organization itself updated successfully: {}", objectMapper.writeValueAsString(savedUser));
+        organization.setFullName(organizationAccountRequest.getFullName());
+        organization.setDirectorFullName(organizationAccountRequest.getDirectorFullName());
+        organization.setPhoneNumber(organizationAccountRequest.getPhoneNumber());
+        organization.setAddress(organizationAccountRequest.getAddress());
+        organization.setInnOrPinfl(organizationAccountRequest.getInn());
+        User editedUser = userRepository.save(user);
+        Organization editedOrganization = organizationRepository.save(organization);
+        log.info("Organization itself updated successfully: {} \t {}", objectMapper.writeValueAsString(editedUser), objectMapper.writeValueAsString(editedOrganization));
         return CommonResponse.builder()
                 .success(true)
                 .message("Updated!")
@@ -207,7 +231,8 @@ public class OrganizationService {
     }
 
     public CommonResponse changePassword(Long id, String currentPassword, String newPassword) {
-        User user = userRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Organization not found with id: " + id));
+        Organization organization = organizationRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Organization not found with id: " + id));
+        User user = userRepository.findById(organization.getUser().getId()).orElse(null);
         if (passwordEncoder.matches(currentPassword, user.getPassword())) {
             user.setPassword(passwordEncoder.encode(newPassword));
             userRepository.save(user);

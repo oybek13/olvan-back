@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -20,9 +21,9 @@ public class PupilResponse {
     private String pupilPhoneNumber;
     private String parentsPhoneNumber;
     private EnrollType enrollType;
-    private String dateBegin;
+    private LocalDate dateBegin;
     private List<String> courseType;
     private int attendance;
     private Boolean status;
-    private String teacherName;
+    private List<String> teacherName;
 }

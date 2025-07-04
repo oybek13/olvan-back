@@ -14,6 +14,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 public class ExHandlerAdvice {
 
+    @ExceptionHandler(UsernameAlreadyExistException.class)
+    public ResponseEntity<?> userAlreadyExistException(UsernameAlreadyExistException exception) {
+        return new ResponseEntity<>(new CommonResponse<>(false, exception.getMessage(), null), HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(DataNotFoundException.class)
     public ResponseEntity<?> dataNotFoundException(DataNotFoundException exception) {
         return new ResponseEntity<>(new CommonResponse<>(false, exception.getMessage(), null), HttpStatus.NOT_FOUND);

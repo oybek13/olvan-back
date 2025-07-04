@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -20,7 +21,7 @@ public class TeacherRequest {
     private String phoneNumber;
     private String gender;
     private String email;
-    private String dateBegin;
+    private LocalDate dateBegin;
     private Boolean status;
     private BigDecimal experience;
     private Integer studentCount;

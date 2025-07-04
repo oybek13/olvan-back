@@ -1,31 +1,20 @@
 package brb.team.olvanback.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity(name = "olvan_lessons")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Data
-public class Lesson {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "created_at", nullable = false)
-    @CreationTimestamp
-    @JsonFormat(pattern = "yyyy-mm-dd HH:mm:ss")
-    LocalDateTime createdAt;
+public class Lesson extends BaseEntity {
 
     @Column(name = "org_id", nullable = false)
     private Long orgId;

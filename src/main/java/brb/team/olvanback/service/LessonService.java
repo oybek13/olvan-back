@@ -4,11 +4,10 @@ import brb.team.olvanback.dto.CommonResponse;
 import brb.team.olvanback.dto.LessonRequest;
 import brb.team.olvanback.dto.TeacherNameResponse;
 import brb.team.olvanback.entity.Lesson;
-import brb.team.olvanback.entity.User;
-import brb.team.olvanback.enums.UserRole;
+import brb.team.olvanback.entity.Teacher;
 import brb.team.olvanback.exception.DataNotFoundException;
 import brb.team.olvanback.repository.LessonRepository;
-import brb.team.olvanback.repository.UserRepository;
+import brb.team.olvanback.repository.TeacherRepository;
 import brb.team.olvanback.service.extra.AppService;
 import brb.team.olvanback.specs.LessonSpecification;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -32,7 +31,7 @@ import java.util.stream.Collectors;
 public class LessonService {
 
     private final LessonRepository lessonRepository;
-    private final UserRepository userRepository;
+    private final TeacherRepository teacherRepository;
     private final AppService appService;
     private final ObjectMapper objectMapper;
 
@@ -60,18 +59,20 @@ public class LessonService {
 
     public CommonResponse getTeachersList(String name, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("fullName").ascending());
-        Page<User> teacherPage;
+        Page<Teacher> teacherPage;
+
         if (name != null && !name.isEmpty()) {
-            teacherPage = userRepository.findByOrgIdAndRoleAndFullNameContainingIgnoreCase(
-                    appService.getOrgId(), UserRole.ROLE_TEACHER, name, pageable);
+            teacherPage = teacherRepository.findByOrgIdAndFullNameContainingIgnoreCase(
+                    appService.getOrgId(), name, pageable);
         } else {
-            teacherPage = userRepository.findByOrgIdAndRole(
-                    appService.getOrgId(), UserRole.ROLE_TEACHER, pageable);
+            teacherPage = teacherRepository.findByOrgId(appService.getOrgId(), pageable);
         }
+
         List<TeacherNameResponse> names = teacherPage
                 .stream()
                 .map(teacher -> TeacherNameResponse.builder().name(teacher.getFullName()).build())
                 .collect(Collectors.toList());
+
         return CommonResponse.builder()
                 .success(true)
                 .message("Success!")

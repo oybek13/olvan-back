@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -23,7 +24,7 @@ public class TeacherResponse implements Serializable {
     private String phoneNumber;
     private String gender;
     private String email;
-    private String dateBegin;
+    private LocalDate dateBegin;
     private Boolean status;
     private BigDecimal experience;
     private List<String> courseType;

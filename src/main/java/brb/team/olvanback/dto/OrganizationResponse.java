@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,7 +22,7 @@ public class OrganizationResponse {
     private String phoneNumber;
     private String directorPhoneNumber;
     private String directorFullName;
-    private String dateBegin;
+    private LocalDate dateBegin;
     private String address;
     private Boolean status;
     private String inn;

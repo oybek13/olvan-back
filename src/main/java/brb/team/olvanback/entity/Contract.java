@@ -1,13 +1,9 @@
 package brb.team.olvanback.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.CreationTimestamp;
-
-import java.time.LocalDateTime;
 
 @Entity(name = "olvan_contracts")
 @Setter
@@ -16,11 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Contract {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+public class Contract extends BaseEntity {
 
     @Column(length = 500, nullable = false)
     String fileName;
@@ -31,12 +23,6 @@ public class Contract {
     @Column(nullable = false)
     Long fileSize;
 
-    @Column(name = "file_created_date", nullable = false)
-    @CreationTimestamp
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    LocalDateTime createdAt;
-
-    @OneToOne
-    @JsonIgnore
-    User user;
+    @Column(name = "org_id")
+    Long orgId;
 }

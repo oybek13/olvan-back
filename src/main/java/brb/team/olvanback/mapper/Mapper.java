@@ -4,9 +4,9 @@ import brb.team.olvanback.dto.OrganizationResponse;
 import brb.team.olvanback.dto.OrganizationsResponse;
 import brb.team.olvanback.dto.PupilResponse;
 import brb.team.olvanback.dto.TeacherResponse;
-import brb.team.olvanback.entity.Contract;
-import brb.team.olvanback.entity.User;
-import brb.team.olvanback.enums.UserRole;
+import brb.team.olvanback.entity.*;
+import brb.team.olvanback.repository.StudentRepository;
+import brb.team.olvanback.repository.TeacherRepository;
 import brb.team.olvanback.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -23,114 +24,131 @@ public class Mapper {
 
     private static ObjectMapper objectMapper = new ObjectMapper();
     private final UserRepository userRepository;
+    private final TeacherRepository teacherRepository;
+    private final StudentRepository studentRepository;
 
-    public Mapper(UserRepository userRepository) {
+    public Mapper(UserRepository userRepository, TeacherRepository teacherRepository, StudentRepository studentRepository) {
         this.userRepository = userRepository;
+        this.teacherRepository = teacherRepository;
+        this.studentRepository = studentRepository;
     }
 
-    public List<OrganizationsResponse> mapOrgs(List<User> users) {
+    public List<OrganizationsResponse> mapOrgs(List<Organization> organizations) {
         List<OrganizationsResponse> list = new ArrayList<>();
-        for (User user : users) {
-            Integer pupilCount = userRepository.countByOrgIdAndRole(user.getId(), UserRole.ROLE_PUPIL);
-            Integer teacherCount = userRepository.countByOrgIdAndRole(user.getId(), UserRole.ROLE_TEACHER);
+
+        // 1. OrgId -> StudentCount map olish
+        Map<Long, Integer> studentCountMap = studentRepository.countStudentsByOrgIds(
+                organizations
+                        .stream()
+                        .map(Organization::getId)
+                        .toList()
+        );
+
+        for (Organization organization : organizations) {
+            User user = userRepository.findById(organization.getUser().getId()).orElse(null);
+            Integer studentCount = studentCountMap.getOrDefault(organization.getId(), 0);
+            Integer teacherCount = teacherRepository.countByOrgId(organization.getId());
+
             list.add(OrganizationsResponse.builder()
-                    .id(user.getId())
-                    .fullName(user.getFullName())
+                    .id(organization.getId())
+                    .fullName(organization.getFullName())
                     .isActive(user.isActive())
-                    .dateBegin(user.getDateBegin())
-                    .address(user.getAddress())
-                    .studentCount(pupilCount)
+                    .dateBegin(organization.getDateBegin())
+                    .address(organization.getAddress())
+                    .studentCount(studentCount)
                     .teacherCount(teacherCount)
                     .build());
         }
         return list;
     }
 
-    public static OrganizationResponse mapOrg(User user, Contract contract) {
+    public static OrganizationResponse mapOrg(User user, Organization organization, Contract contract) {
         return OrganizationResponse.builder()
-                .id(user.getId())
+                .id(organization.getId())
                 .username(user.getUsername())
                 .password(user.getPassword())
-                .fullName(user.getFullName())
-                .phoneNumber(user.getPhoneNumber())
-                .directorPhoneNumber(user.getParentsPhoneNumber())
-                .directorFullName(user.getParentsFullName())
-                .dateBegin(user.getDateBegin())
-                .address(user.getAddress())
-                .inn(user.getInn())
                 .status(user.isActive())
+                .fullName(organization.getFullName())
+                .phoneNumber(organization.getPhoneNumber())
+                .directorPhoneNumber(organization.getDirectorPhoneNumber())
+                .directorFullName(organization.getDirectorFullName())
+                .dateBegin(organization.getDateBegin())
+                .address(organization.getAddress())
+                .inn(organization.getInnOrPinfl())
                 .contract(contract)
                 .build();
     }
 
-    public static OrganizationResponse mapOrgAccount(User user) {
+    public static OrganizationResponse mapOrgAccount(User user, Organization organization) {
         return OrganizationResponse.builder()
-                .id(user.getId())
-                .fullName(user.getFullName())
-                .directorFullName(user.getParentsFullName())
-                .phoneNumber(user.getPhoneNumber())
+                .id(organization.getId())
+                .fullName(organization.getFullName())
+                .directorFullName(organization.getDirectorFullName())
+                .phoneNumber(organization.getPhoneNumber())
                 .username(user.getUsername())
                 .password(user.getPassword())
-                .address(user.getAddress())
-                .inn(user.getInn())
+                .address(organization.getAddress())
+                .inn(organization.getInnOrPinfl())
                 .build();
     }
 
-    public static PupilResponse mapPupil(User user) throws JsonProcessingException {
+    public static PupilResponse mapStudent(User user, Student student) throws JsonProcessingException {
         return PupilResponse.builder()
-                .id(user.getId())
+                .id(student.getId())
                 .username(user.getUsername())
-                .fullName(user.getFullName())
-                .parentsFullName(user.getParentsFullName())
-                .pupilPhoneNumber(user.getPhoneNumber())
-                .parentsPhoneNumber(user.getParentsPhoneNumber())
-                .enrollType(user.getEnrollType())
-                .dateBegin(user.getDateBegin())
-                .courseType(Arrays.asList(objectMapper.readValue(user.getCourseType(), String[].class)))
-                .attendance(user.getAttendance())
                 .status(user.isActive())
-                .teacherName(user.getTeacherName())
+                .fullName(student.getFullName())
+                .parentsFullName(student.getParentsFullName())
+                .pupilPhoneNumber(student.getStudentPhoneNumber())
+                .parentsPhoneNumber(student.getParentsPhoneNumber())
+                .enrollType(student.getEnrollType())
+                .dateBegin(student.getDateBegin())
+                .courseType(Arrays.asList(objectMapper.readValue(student.getCourseType(), String[].class)))
+                .attendance(student.getAttendance())
+                .teacherName(Arrays.asList(objectMapper.readValue(student.getTeacherName(), String[].class)))
                 .build();
     }
 
-    public static List<PupilResponse> mapPupils(List<User> content) throws JsonProcessingException {
+    public List<PupilResponse> mapStudents(List<Student> content) throws JsonProcessingException {
         List<PupilResponse> list = new ArrayList<>();
-        for (User user : content) {
-            list.add(mapPupil(user));
+        for (Student student : content) {
+            User user = userRepository.findById(student.getUser().getId()).orElse(null);
+            list.add(mapStudent(user, student));
         }
         return list;
     }
 
-    public static TeacherResponse mapTeacher(User user) throws JsonProcessingException {
+    public static TeacherResponse mapTeacher(User user, Teacher teacher) throws JsonProcessingException {
         return TeacherResponse.builder()
-                .id(user.getId())
+                .id(teacher.getId())
                 .username(user.getUsername())
-                .fullName(user.getFullName())
-                .degree(user.getDegree())
-                .phoneNumber(user.getPhoneNumber())
-                .gender(user.getGender())
-                .email(user.getEmail())
-                .dateBegin(user.getDateBegin())
                 .status(user.isActive())
-                .experience(user.getExperience())
-                .courseType(Arrays.asList(objectMapper.readValue(user.getCourseType(), String[].class)))
-                .studentCount(user.getStudentCount())
+                .fullName(teacher.getFullName())
+                .degree(teacher.getDegree())
+                .phoneNumber(teacher.getPhoneNumber())
+                .gender(teacher.getGender())
+                .email(teacher.getEmail())
+                .dateBegin(teacher.getDateBegin())
+                .experience(teacher.getExperience())
+                .courseType(Arrays.asList(objectMapper.readValue(teacher.getCourseType(), String[].class)))
+                .studentCount(teacher.getStudentCount())
                 .build();
     }
 
-    public static TeacherResponse mapTeacherAccount(User user) {
+    public static TeacherResponse mapTeacherAccount(Teacher teacher) {
         return TeacherResponse.builder()
-                .fullName(user.getFullName())
-                .email(user.getEmail())
-                .phoneNumber(user.getPhoneNumber())
+                .fullName(teacher.getFullName())
+                .email(teacher.getEmail())
+                .phoneNumber(teacher.getPhoneNumber())
                 .build();
     }
 
 
-    public static List<TeacherResponse> mapTeachers(List<User> content) throws JsonProcessingException {
+    public List<TeacherResponse> mapTeachers(List<Teacher> content) throws JsonProcessingException {
         List<TeacherResponse> list = new ArrayList<>();
-        for (User user : content) {
-            list.add(mapTeacher(user));
+        for (Teacher teacher : content) {
+            User user = userRepository.findById(teacher.getUser().getId()).orElse(null);
+            list.add(mapTeacher(user, teacher));
         }
         return list;
     }

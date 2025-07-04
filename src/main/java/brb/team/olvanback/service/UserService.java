@@ -3,9 +3,11 @@ package brb.team.olvanback.service;
 import brb.team.olvanback.dto.CommonResponse;
 import brb.team.olvanback.dto.SignInRequest;
 import brb.team.olvanback.dto.SignUpRequest;
+import brb.team.olvanback.entity.Organization;
 import brb.team.olvanback.entity.User;
 import brb.team.olvanback.enums.UserRole;
 import brb.team.olvanback.exception.DataNotFoundException;
+import brb.team.olvanback.repository.OrganizationRepository;
 import brb.team.olvanback.repository.UserRepository;
 import brb.team.olvanback.utils.jwt.JwtGenerator;
 import lombok.extern.slf4j.Slf4j;
@@ -27,26 +29,27 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
     private final JwtGenerator jwtGenerator;
     private final PasswordEncoder passwordEncoder;
+    private final OrganizationRepository organizationRepository;
 
-    public UserService(UserRepository userRepository, AuthenticationManager authenticationManager, JwtGenerator jwtGenerator, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, AuthenticationManager authenticationManager, JwtGenerator jwtGenerator, PasswordEncoder passwordEncoder, OrganizationRepository organizationRepository) {
         this.userRepository = userRepository;
         this.authenticationManager = authenticationManager;
         this.jwtGenerator = jwtGenerator;
         this.passwordEncoder = passwordEncoder;
+        this.organizationRepository = organizationRepository;
     }
 
     public CommonResponse signUp(SignUpRequest sign) {
-        User savedUser = userRepository.save(User.builder()
+        userRepository.save(User.builder()
                 .username(sign.getUsername())
                 .password(passwordEncoder.encode(sign.getPassword()))
                 .role(sign.getRole())
-                .fullName(sign.getFullName())
                 .isActive(true)
                 .build());
+        log.warn("User created successfully!");
         return CommonResponse.builder()
                 .success(true)
                 .message("Sign up successful")
-                .data(savedUser)
                 .build();
     }
 
@@ -56,17 +59,18 @@ public class UserService {
         roles.add(user.getRole().toString());
         Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(sign.getUsername(), sign.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authenticate);
-        if (user.getRole() == UserRole.ROLE_SCHOOL || user.getRole() == UserRole.ROLE_SUPER_ADMIN) {
+        if (user.getRole() == UserRole.ROLE_SUPER_ADMIN) {
             return CommonResponse.builder()
                     .success(true)
                     .message("Sign in successful")
                     .data(jwtGenerator.generateToken(sign.getUsername(), roles, user.getId()))
                     .build();
         }
+        Organization organization = organizationRepository.findByUser(user).orElseThrow(() -> new DataNotFoundException("Organization not found !"));
         return CommonResponse.builder()
                 .success(true)
                 .message("Sign in successful")
-                .data(jwtGenerator.generateToken(sign.getUsername(), roles, user.getOrgId()))
+                .data(jwtGenerator.generateToken(sign.getUsername(), roles, organization.getId()))
                 .build();
     }
 

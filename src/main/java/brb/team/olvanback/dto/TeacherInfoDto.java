@@ -1,6 +1,7 @@
 package brb.team.olvanback.dto;
 
-import brb.team.olvanback.enums.UserRole;
+import brb.team.olvanback.entity.Teacher;
+import brb.team.olvanback.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,8 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class SignUpRequest {
-    private String username;
-    private String password;
-    private UserRole role;
+public class TeacherInfoDto {
+    private Teacher teacher;
+    private User user;
 }
