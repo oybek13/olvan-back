@@ -31,7 +31,7 @@ public class ExHandlerAdvice {
             throw (RuntimeException) e;
         }
 
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new CommonResponse<>(false, "Internal Server Error", null));
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new CommonResponse<>(false, e.getMessage(), null));
     }
 
 }

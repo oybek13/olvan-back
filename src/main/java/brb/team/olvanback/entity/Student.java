@@ -55,4 +55,8 @@ public class Student extends BaseEntity {
             inverseJoinColumns = @JoinColumn(name = "organization_id")
     )
     private List<Organization> organizations;
+
+    @ManyToOne
+    @JoinColumn(name = "client_id")
+    private Client client;
 }

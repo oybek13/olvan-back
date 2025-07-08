@@ -59,11 +59,19 @@ public class UserService {
         roles.add(user.getRole().toString());
         Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(sign.getUsername(), sign.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authenticate);
-        if (user.getRole() == UserRole.ROLE_SUPER_ADMIN) {
+        UserRole role = user.getRole();
+        if (role == UserRole.ROLE_SUPER_ADMIN) {
             return CommonResponse.builder()
                     .success(true)
                     .message("Sign in successful")
                     .data(jwtGenerator.generateToken(sign.getUsername(), roles, user.getId()))
+                    .build();
+        }
+        if (role == UserRole.ROLE_CLIENT) {
+            return CommonResponse.builder()
+                    .success(true)
+                    .message("Sign in successful")
+                    .data(jwtGenerator.generateToken(sign.getUsername(), roles, null))
                     .build();
         }
         Organization organization = organizationRepository.findByUser(user).orElseThrow(() -> new DataNotFoundException("Organization not found !"));

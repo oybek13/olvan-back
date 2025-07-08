@@ -11,6 +11,9 @@
     <include file="db/migration/sql/tables/v1_004_students.sql" context="olvan"/>
     <include file="db/migration/sql/tables/v1_005_lessons.sql" context="olvan"/>
     <include file="db/migration/sql/tables/v1_006_contracts.sql" context="olvan"/>
+    <include file="db/migration/sql/tables/v1_007_clients.sql" context="olvan"/>
+    <include file="db/migration/sql/tables/v2_008_students.sql" context="olvan"/>
+
 
 <!--    <changeSet id="ln_class_credit_values" author="claim-service">-->
 <!--        <sqlFile path="db/migration/sql/values/v1_02_ln_class_credit_values.sql"/>-->
