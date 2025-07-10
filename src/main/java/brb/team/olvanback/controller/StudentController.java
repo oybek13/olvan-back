@@ -1,5 +1,6 @@
 package brb.team.olvanback.controller;
 
+import brb.team.olvanback.dto.CommonResponse;
 import brb.team.olvanback.dto.StudentRequest;
 import brb.team.olvanback.service.StudentService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -53,5 +54,11 @@ public class StudentController {
     @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN', 'ROLE_SCHOOL', 'ROLE_TEACHER')")
     public ResponseEntity<?> delete(@PathVariable(value = "studentId") Long studentId) throws JsonProcessingException {
         return ResponseEntity.ok(studentService.deleteStudent(studentId));
+    }
+
+    @GetMapping("/getCourseTypesByStudentId")
+    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN', 'ROLE_SCHOOL', 'ROLE_TEACHER')")
+    public ResponseEntity<CommonResponse> getCourseTypes(@RequestParam(value = "studentId") Long id) {
+        return ResponseEntity.ok(studentService.getCourseTypesByStudentId(id));
     }
 }

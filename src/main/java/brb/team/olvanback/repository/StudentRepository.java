@@ -1,5 +1,6 @@
 package brb.team.olvanback.repository;
 
+import brb.team.olvanback.entity.Client;
 import brb.team.olvanback.entity.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -22,4 +23,6 @@ public interface StudentRepository extends JpaRepository<Student, Long>, JpaSpec
         return findStudentCountsByOrgIds(orgIds).stream()
                 .collect(Collectors.toMap(OrgCountProjection::getOrgId, p -> p.getCnt().intValue()));
     }
+
+    List<Student> findByClient(Client client);
 }

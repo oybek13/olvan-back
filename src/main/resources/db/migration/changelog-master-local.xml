@@ -4,8 +4,8 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
-    <include file="/db/migration/sql/tables/v1_001_users.sql" context="olvan"/>
-    <include file="/db/migration/sql/tables/v1_002_organizations.sql" context="olvan"/>
+    <include file="db/migration/sql/tables/v1_001_users.sql" context="olvan"/>
+    <include file="db/migration/sql/tables/v1_002_organizations.sql" context="olvan"/>
     <include file="db/migration/sql/tables/v1_003_teachers.sql" context="olvan"/>
     <include file="db/migration/sql/tables/v2_003_teachers.sql" context="olvan"/>
     <include file="db/migration/sql/tables/v1_004_students.sql" context="olvan"/>
@@ -13,9 +13,14 @@
     <include file="db/migration/sql/tables/v1_006_contracts.sql" context="olvan"/>
     <include file="db/migration/sql/tables/v1_007_clients.sql" context="olvan"/>
     <include file="db/migration/sql/tables/v2_008_students.sql" context="olvan"/>
+    <include file="db/migration/sql/tables/v3_004_students.sql" context="olvan"/>
+    <include file="db/migration/sql/tables/v3_008_subscriptions.sql" context="olvan"/>
+    <include file="db/migration/sql/tables/v4_004_students.sql" context="olvan"/>
+    <include file="db/migration/sql/tables/v5_004_students.sql" context="olvan"/>
+    <include file="db/migration/sql/tables/v1_009_student_organization_lesson.sql" context="olvan"/>
 
 
-<!--    <changeSet id="ln_class_credit_values" author="claim-service">-->
-<!--        <sqlFile path="db/migration/sql/values/v1_02_ln_class_credit_values.sql"/>-->
-<!--    </changeSet>-->
+    <changeSet id="v3_subscriptions_values" author="olvan-service">
+        <sqlFile path="db/migration/sql/tables/values/v3_001_olvan_subscriptions.sql"/>
+    </changeSet>
 </databaseChangeLog>

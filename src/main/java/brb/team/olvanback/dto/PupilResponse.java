@@ -22,8 +22,6 @@ public class PupilResponse {
     private String parentsPhoneNumber;
     private EnrollType enrollType;
     private LocalDate dateBegin;
-    private List<String> courseType;
-    private int attendance;
     private Boolean status;
-    private List<String> teacherName;
+    private LocalDate birthDate;
 }

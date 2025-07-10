@@ -103,9 +103,7 @@ public class Mapper {
                 .parentsPhoneNumber(student.getParentsPhoneNumber())
                 .enrollType(student.getEnrollType())
                 .dateBegin(student.getDateBegin())
-                .courseType(Arrays.asList(objectMapper.readValue(student.getCourseType(), String[].class)))
-                .attendance(student.getAttendance())
-                .teacherName(Arrays.asList(objectMapper.readValue(student.getTeacherName(), String[].class)))
+                .birthDate(student.getBirthDate())
                 .build();
     }
 

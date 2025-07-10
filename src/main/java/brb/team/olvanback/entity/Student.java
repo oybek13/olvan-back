@@ -35,14 +35,8 @@ public class Student extends BaseEntity {
     @Column(name = "date_begin")
     private LocalDate dateBegin;
 
-    @Column(name = "attendance")
-    private Integer attendance;
-
-    @Column(name = "course_type", columnDefinition = "TEXT")
-    private String courseType;
-
-    @Column(name = "teacher_name", columnDefinition = "TEXT")
-    private String teacherName;
+    @Column(name = "birth_date")
+    private LocalDate birthDate;
 
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false, unique = true)

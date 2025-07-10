@@ -49,7 +49,7 @@ public class OrganizationController {
     }
 
     @GetMapping("/all")
-    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN', 'ROLE_CLIENT')")
     public ResponseEntity<?> getAll(@RequestParam(value = "address", required = false) String address,
                                     @RequestParam(value = "fullName", required = false) String fullName,
                                     @RequestParam(value = "inn", required = false) String inn,

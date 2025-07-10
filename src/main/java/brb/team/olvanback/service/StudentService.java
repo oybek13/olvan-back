@@ -3,22 +3,16 @@ package brb.team.olvanback.service;
 import brb.team.olvanback.dto.CommonResponse;
 import brb.team.olvanback.dto.PagePupilsResponse;
 import brb.team.olvanback.dto.StudentRequest;
-import brb.team.olvanback.entity.Organization;
-import brb.team.olvanback.entity.Student;
-import brb.team.olvanback.entity.User;
+import brb.team.olvanback.entity.*;
 import brb.team.olvanback.enums.UserRole;
 import brb.team.olvanback.exception.DataNotFoundException;
 import brb.team.olvanback.exception.UsernameAlreadyExistException;
 import brb.team.olvanback.mapper.Mapper;
-import brb.team.olvanback.repository.OrganizationRepository;
-import brb.team.olvanback.repository.StudentRepository;
-import brb.team.olvanback.repository.UserRepository;
+import brb.team.olvanback.repository.*;
 import brb.team.olvanback.service.extra.AppService;
 import brb.team.olvanback.specs.StudentSpecification;
-import brb.team.olvanback.utils.jwt.JwtGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -34,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -42,12 +37,12 @@ public class StudentService {
     private final UserRepository userRepository;
     private final StudentRepository studentRepository;
     private final OrganizationRepository organizationRepository;
-    private final JwtGenerator jwtGenerator;
     private final ObjectMapper objectMapper;
-    private final HttpServletRequest request;
     private final PasswordEncoder passwordEncoder;
     private final AppService appService;
     private final Mapper mapper;
+    private final StudentOrganizationLessonRepository studentOrganizationLessonRepository;
+    private final LessonRepository lessonRepository;
 
     @Transactional
     public CommonResponse createStudent(StudentRequest studentRequest) throws JsonProcessingException {
@@ -71,9 +66,6 @@ public class StudentService {
                 .parentsPhoneNumber(studentRequest.getParentsPhoneNumber())
                 .enrollType(studentRequest.getEnrollType())
                 .dateBegin(studentRequest.getDateBegin())
-                .attendance(studentRequest.getAttendance())
-                .courseType(objectMapper.writeValueAsString(studentRequest.getCourseType()))
-                .teacherName(objectMapper.writeValueAsString(studentRequest.getTeacherName()))
                 .user(userStudent)
                 .organizations(organizations)
                 .build());
@@ -157,9 +149,6 @@ public class StudentService {
         student.setParentsPhoneNumber(studentRequest.getParentsPhoneNumber());
         student.setEnrollType(studentRequest.getEnrollType());
         student.setDateBegin(studentRequest.getDateBegin());
-        student.setAttendance(studentRequest.getAttendance());
-        student.setCourseType(objectMapper.writeValueAsString(studentRequest.getCourseType()));
-        student.setTeacherName(objectMapper.writeValueAsString(studentRequest.getTeacherName()));
         User editedUserStudent = userRepository.save(user);
         log.warn("UserStudent updated: {}", objectMapper.writeValueAsString(editedUserStudent));
         Student editedStudent = studentRepository.save(student);
@@ -184,4 +173,17 @@ public class StudentService {
                 .build();
     }
 
+    public CommonResponse getCourseTypesByStudentId(Long studentId) {
+        Long orgId = appService.getOrgId();
+        List<StudentOrganizationLesson> solList = studentOrganizationLessonRepository.findByStudentIdAndOrganizationId(studentId, orgId);
+        List<Lesson> lessons = solList
+                .stream()
+                .map(studentOrganizationLesson -> lessonRepository.findById(studentOrganizationLesson.getLesson().getId()).orElse(null))
+                .toList();
+        return CommonResponse.builder()
+                .success(true)
+                .message("Success!")
+                .data(lessons)
+                .build();
+    }
 }

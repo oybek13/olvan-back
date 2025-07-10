@@ -1,6 +1,7 @@
 package brb.team.olvanback.entity;
 
 import brb.team.olvanback.enums.EnrollType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,5 +37,6 @@ public class Client extends BaseEntity {
     private User user;
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Student> students;
 }
